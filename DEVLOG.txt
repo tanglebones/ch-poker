@@ -1,0 +1,4 @@
+17-02-2012T18:50
+
+	Reading initial spec. I'll assume a quickly writen solution is favored over an optimized for speed or memory solution.
+
