@@ -85,5 +85,11 @@
 
 	Fairly confident in the implementation now. Cases not covered related to full house, two pairs, and five of a kind which out of scope for now.
 
+19-02-2012T12:00
 
+    Break for lunch
+
+19-02-2012T12:40
+
+	Updating README to help others understand the organization of the code.
 
