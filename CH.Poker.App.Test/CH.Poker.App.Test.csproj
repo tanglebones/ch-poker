@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{8043D3D5-A589-4A8F-8133-6FF24F6937EC}</ProjectGuid>
+    <ProjectGuid>{A13CCE1A-56F7-40F4-AE30-6642BDD1261B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CH.Poker</RootNamespace>
-    <AssemblyName>CH.Poker</AssemblyName>
+    <RootNamespace>CH.Poker.App.Test</RootNamespace>
+    <AssemblyName>CH.Poker.App.Test</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,9 +30,12 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.5.10.11092\lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -42,9 +45,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IRanker.cs" />
-    <Compile Include="SimpleRankerForIq.cs" />
+    <Compile Include="Driver.cs" />
+    <Compile Include="ITestCase.cs" />
+    <Compile Include="ITestCaseProvider.cs" />
+    <Compile Include="Output.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestCase.cs" />
+    <Compile Include="TestExampleFromSpec.cs" />
+    <Compile Include="TestNoInputProducesError.cs" />
+    <Compile Include="TestNonUniqueOwnerNamesCausesAnError.cs" />
+    <Compile Include="TestSameCardIsAllowedInMulipleHands.cs" />
+    <Compile Include="TestsForIncorrectNumberOfFields.cs" />
+    <Compile Include="TestsForInvalidCards.cs" />
+    <Compile Include="TestsForRankingAcrossHandTypes.cs" />
+    <Compile Include="TestSingleHandIsAllowed.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CH.Poker.App.Impl\CH.Poker.App.Impl.csproj">
+      <Project>{7CF31A43-852F-4440-9489-0F8843385B3C}</Project>
+      <Name>CH.Poker.App.Impl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CH.Poker.App\CH.Poker.App.csproj">
+      <Project>{0CD85E2C-0953-4232-B8C1-6B87F367F416}</Project>
+      <Name>CH.Poker.App</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

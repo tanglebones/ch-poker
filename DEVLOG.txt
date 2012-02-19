@@ -1,4 +1,89 @@
 17-02-2012T18:50
 
 	Reading initial spec. I'll assume a quickly writen solution is favored over an optimized for speed or memory solution.
+	Setting up using my normal baseline project that handles nuget as a prebuild step to avoid cross csproj package version drift.
+
+17-02-2012T19:00
+
+	Baseline on github
+	Setting up .App and .Test projects
+	Start on initial test driver for the app
+
+17-02-2012T19:10
+
+	Driver setup, working on first test.
+	First test failing, working on getting it to pass.
+
+17-02-2012T19:54
+
+	Just noticed the spec doesn't cover the representation of Jack, Queen, or King. (Assuming A is Ace.)
+	I'll use J, Q, and K. I'll also allow T for 10.
+	Building out tests and code around parsing the input for the app
+
+17-02-2012T20:30
+
+	Taking a break.
+
+17-02-2012T20:45
+
+    Resuming.
+
+17-02-2012T22:05
+
+	Realized I'm making lots of assumptions about error reporting. I've decided to validate the inputs are reporting accordingly.
+
+17-02-2012T22:10
+
+	Refactoring out code to make things more testable and to be able to run the tests against the code directly as well as the produced console app
+
+17-02-2012T22:35
+
+    Taking a break.
+
+17-02-2012T22:45
+
+	Assuming hand order is: Flush, Three of a Kind, One Pair, High Card.
+	Assuming: Four of a kind is mapped to Three of a Kind
+	Assuming: Full House is mapped to Three of a Kind
+	Assuming: Two pair is mapped to One Pair
+	Assuming: The higher card ranks are used to break ties between hands of the same order.
+
+18-02-2012T00:20
+
+	Almost have the algo for ranking done...
+
+18-02-2012T00:45
+
+	Just realised I'm allowing cards to be duplicated in a hand... woops.
+
+18-02-2012T01:00
+
+	Signing off for today.
+
+19-02-2012T09:00
+
+    More testing.
+	Assuming the single hand case is valid and not an error.
+	Assuming reusing cards across hands is allowed, as some games have common cards that are shared between hands.
+	Assuming card input is not case sensitive for the application.
+
+19-02-2012T09:40
+
+	Need coffee... taking a break
+
+19-02-2012T10:00
+
+    Back to testing to the library code. The testing is oddly split between the app and the library.
+	I'm going to try and avoid tests that would not pass when the ranking is extended to the full hard orders (full house, quads, straights, etc.)
+
+19-02-2012T11:00
+
+    If only we could store a table with every 5 card arrangement of cards... kinda to large to fit in memory, but it would making scoring a hand O(1).
+	For simliar reasons we can't test every possible hand against each other as it would take far too long to finish. We'll settle for testing families of conditions.
+
+19-02-2012T11:50
+
+	Fairly confident in the implementation now. Cases not covered related to full house, two pairs, and five of a kind which out of scope for now.
+
+
 
