@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IRanker.cs" />
+    <Compile Include="SimpleRanker.cs" />
     <Compile Include="SimpleRankerForIq.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
