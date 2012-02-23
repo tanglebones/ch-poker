@@ -76,8 +76,12 @@ namespace CH.Poker.Test.SimpleRanker
             }
         }
 
-
         private void HandsAreInOrder(params IEnumerable<string>[] hands)
+        {
+            HandsAreInOrder(hands.AsEnumerable());
+        }
+
+        private void HandsAreInOrder(IEnumerable<IEnumerable<string>> hands)
         {
             var convertedHands = hands.Select(hand => hand.Select(_ranker.ScoreCard));
 
@@ -85,6 +89,21 @@ namespace CH.Poker.Test.SimpleRanker
             var sorted = scored.OrderBy(score => score).ToArray();
             Assert.That(scored.SequenceEqual(sorted));
         }
+
+        private void HandsAreEqual(params IEnumerable<string>[] hands)
+        {
+            HandsAreEqual(hands.AsEnumerable());
+        }
+
+        private void HandsAreEqual(IEnumerable<IEnumerable<string>> hands)
+        {
+            var convertedHands = hands.Select(hand => _ranker.ScoreHand(hand.Select(_ranker.ScoreCard))).ToArray();
+            Assert.That(convertedHands.Length,Is.GreaterThan(1));
+            var first = convertedHands[0];
+            for(var i=1;i<convertedHands.Length;++i)
+                Assert.That(convertedHands[i],Is.EqualTo(first));
+        }
+
 
         [Test]
         public void ComparingFiveOfAKindsGoesToTheHigherFiveOfAKind()
@@ -106,8 +125,6 @@ namespace CH.Poker.Test.SimpleRanker
                 );
         }
 
-        // TODO: Straight Flush tests
-        //   - include tests for different suit and same rank being equal.
         [Test]
         public void ComparingStraightFlushesGoesToTheHigherStraightFlush()
         {
@@ -123,6 +140,20 @@ namespace CH.Poker.Test.SimpleRanker
                 new[] { "6S", "5S", "4S", "3S", "2S" },
                 new[] { "5S", "4S", "3S", "2S", "AS" }
             );
+        }
+
+        [Test]
+        public void DifferentSuitedStraightFlushesAreEqual()
+        {
+            var ranks = new[] {'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'};
+            var suits = new[] {'H', 'C', 'D', 'S'};
+
+            for(var rankSkip = 0; rankSkip<ranks.Length-5;++rankSkip)
+            {
+                var skip = rankSkip; // avoid access to modified closure warning
+                var hands = suits.Select(suit => ranks.Skip(skip).Take(5).Select(rank => new string(new[] {rank, suit})));
+                HandsAreEqual(hands);
+            }
         }
 
         [Test]
@@ -145,9 +176,25 @@ namespace CH.Poker.Test.SimpleRanker
             );
         }
 
-
-        // TODO: Fullhouse tests
-        //   - include kkk88 vs qqqaa, i.e. low pair higher than higher trips.
+        [Test]
+        public void ComparingFullHouseGoesToTheHigherFullHouse()
+        {
+            HandsAreInOrder(
+                new[] { "AH", "AD", "AS", "3H", "3D" },
+                new[] { "KH", "KD", "KS", "2H", "2D" },
+                new[] { "QH", "QD", "QS", "4H", "4D" },
+                new[] { "JH", "JD", "JS", "5H", "5D" },
+                new[] { "TH", "TD", "TS", "AH", "AD" },
+                new[] { "9H", "9D", "9S", "AH", "AD" },
+                new[] { "8H", "8D", "8S", "9H", "9D" },
+                new[] { "7H", "7D", "7S", "9H", "9D" },
+                new[] { "6H", "6D", "6S", "TH", "TD" },
+                new[] { "5H", "5D", "5S", "JH", "JD" },
+                new[] { "4H", "4D", "4S", "QH", "QD" },
+                new[] { "3H", "3D", "3S", "KH", "KD" },
+                new[] { "2H", "2D", "2S", "AH", "AD" }
+                );
+        }
 
         [Test]
         public void ComparingFlushesGoesToTheHigherFlush()
@@ -161,7 +208,22 @@ namespace CH.Poker.Test.SimpleRanker
                 );
         }
 
-        // TODO: Staight tests
+        [Test]
+        public void ComparingStraightGoesToTheHigherStraight()
+        {
+            HandsAreInOrder(
+                new[] { "AS", "KS", "QS", "JS", "TC" },
+                new[] { "KS", "QS", "JS", "TS", "9C" },
+                new[] { "QS", "JS", "TS", "9S", "8C" },
+                new[] { "JS", "TS", "9S", "8S", "7C" },
+                new[] { "TS", "9S", "8S", "7S", "6C" },
+                new[] { "9S", "8S", "7S", "6S", "5C" },
+                new[] { "8S", "7S", "6S", "5S", "4C" },
+                new[] { "7S", "6S", "5S", "4S", "3C" },
+                new[] { "6S", "5S", "4S", "3S", "2C" },
+                new[] { "5S", "4S", "3S", "2S", "AC" }
+            );
+        }
 
         [Test]
         public void ComparingTripsGoesToTheHigherTrip()
@@ -185,6 +247,35 @@ namespace CH.Poker.Test.SimpleRanker
 
         // TODO: Two pair tests
         //   - include 99664 vs 88774, i.e. that the highest pair wins.
+
+        [Test]
+        public void SortOrderOfTwoPairCasesDoesNotChangeScore()
+        {
+            HandsAreInOrder(
+                new[] {"8H", "8D", "9S", "3D", "3H"},
+                new[] {"8H", "8D", "6S", "3D", "3H"},
+                new[] {"8H", "8D", "2S", "3D", "3H"}
+                );
+        }
+
+        [Test]
+        public void ComparingTwoPairsGoesToTheHigherTwoPair()
+        {
+            HandsAreInOrder(
+                new[] { "AH", "AD", "2S", "2H", "3H" },
+                new[] { "KH", "KD", "3S", "3H", "2H" },
+                new[] { "QH", "QD", "4S", "4H", "2H" },
+                new[] { "JH", "JD", "5S", "5H", "2H" },
+                new[] { "TH", "TD", "6S", "6H", "2H" },
+                new[] { "9H", "9D", "7S", "7H", "2H" },
+                new[] { "8H", "8D", "9S", "2D", "2H" },
+                new[] { "7H", "7D", "9S", "2D", "2H" },
+                new[] { "6H", "6D", "TS", "2D", "2H" },
+                new[] { "5H", "5D", "JS", "2D", "2H" },
+                new[] { "4H", "4D", "QS", "2D", "2H" },
+                new[] { "3H", "3D", "KS", "2D", "2H" }
+                );
+        }
 
         [Test]
         public void ComparingPairsGoesToTheHigherPair()

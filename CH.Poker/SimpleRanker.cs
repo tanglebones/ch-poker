@@ -21,7 +21,8 @@ namespace CH.Poker
         private static readonly IDictionary<char, int> RankToScore =
             new Dictionary<char, int>
                 {
-                    {'a', 13}, // low ace
+                    {'a', 13},
+                    // low ace
                     {'2', 12},
                     {'3', 11},
                     {'4', 10},
@@ -36,6 +37,7 @@ namespace CH.Poker
                     {'K', 1},
                     {'A', 0},
                 };
+
         private static readonly int[] CardSuit = new int[52];
         private static readonly int[] CardRank = new int[52];
 
@@ -51,7 +53,7 @@ namespace CH.Poker
         // 8 - 1P
         // 9 - HC
 
-        enum HandOrder
+        private enum HandOrder
         {
             FiveOfAKind = 0,
             StraightFlush = 1,
@@ -91,31 +93,31 @@ namespace CH.Poker
         private static readonly Func<int[], int[]>[] MatchesToReorderFunction =
             new Func<int[], int[]>[]
                 {
-                    x=>x, // 0000
-                    x=>x, // 0001
-                    x=>new[]{x[1],x[2],x[0],x[3],x[4]}, // 0010
-                    x=>x, // 0011
-                    x=>new[]{x[2],x[3],x[0],x[1],x[4]}, // 0100
-                    x=> // 0101
-                    CardRank[x[0]]<CardRank[x[2]]
+                    x => x, // 0000
+                    x => x, // 0001
+                    x => new[] {x[1], x[2], x[0], x[3], x[4]}, // 0010
+                    x => x, // 0011
+                    x => new[] {x[2], x[3], x[0], x[1], x[4]}, // 0100
+                    x => // 0101
+                    x[0] < x[2]
                         ? x
-                        : new[]{x[2],x[3],x[0],x[1],x[4]},
-                    x=>new[]{x[1],x[2],x[3],x[0],x[4]}, // 0110
-                    x=>x, // 0111
-                    x=>new[]{x[3],x[4],x[0],x[1],x[2]}, // 1000
-                    x=> // 1001
-                    CardRank[x[0]]<CardRank[x[3]]
-                        ? x
-                        : new[]{x[3],x[4],x[0],x[1],x[2]},
-                    x=> // 1010
-                    CardRank[x[1]]<CardRank[x[3]]
-                        ? x
-                        : new[]{x[3],x[4],x[1],x[2],x[0]},
-                    x=>x, // 1011
-                    x=>new[]{x[2],x[3],x[4],x[0],x[1]}, // 1100
-                    x=>new[]{x[2],x[3],x[4],x[0],x[1]}, // 1101
-                    x=>new[]{x[1],x[2],x[3],x[4],x[0]}, // 1110
-                    x=>x, // 1111
+                        : new[] {x[2], x[3], x[0], x[1], x[4]},
+                    x => new[] {x[1], x[2], x[3], x[0], x[4]}, // 0110
+                    x => x, // 0111
+                    x => new[] {x[3], x[4], x[0], x[1], x[2]}, // 1000
+                    x => // 1001
+                    x[0] < x[3]
+                        ? new[] {x[0], x[1], x[3], x[4], x[2]}
+                        : new[] {x[3], x[4], x[0], x[1], x[2]},
+                    x => // 1010
+                    x[1] < x[3]
+                        ? new[] {x[1], x[2], x[3], x[4], x[0]}
+                        : new[] {x[3], x[4], x[1], x[2], x[0]},
+                    x => x, // 1011
+                    x => new[] {x[2], x[3], x[4], x[0], x[1]}, // 1100
+                    x => new[] {x[2], x[3], x[4], x[0], x[1]}, // 1101
+                    x => new[] {x[1], x[2], x[3], x[4], x[0]}, // 1110
+                    x => x, // 1111
                 };
 
         private static readonly IDictionary<string, int> CardToScore =
@@ -175,8 +177,10 @@ namespace CH.Poker
                     {"AS", 0},
                 };
 
-        private static readonly int[] AceLowStraight = new[] {0,9,10,11,12};
-        private static readonly int[] AceLowStraightCardRanks = new [] {'a','2','3','4','5'}.Select(card=>RankToScore[card]).ToArray();
+        private static readonly int[] AceLowStraightCardRanks =
+            new[] {'a', '2', '3', '4', '5'}.Select(card => RankToScore[card]).ToArray();
+
+        private static readonly int[] AceLowStraight = AceLowStraightCardRanks.OrderBy(rank => rank).ToArray();
 
         static SimpleRanker()
         {
@@ -212,10 +216,10 @@ namespace CH.Poker
             var isFlush = cardsAsArray.Skip(1).Aggregate(true, (current, card) => current && CardSuit[card] == firstSuit);
             var isAceLowStraight = cardRanksAsArray.SequenceEqual(AceLowStraight);
             var isStraight = isAceLowStraight ||
-                (cardRanksAsArray[0] == (cardRanksAsArray[1] - 1) &&
-                 cardRanksAsArray[0] == (cardRanksAsArray[2] - 2) &&
-                 cardRanksAsArray[0] == (cardRanksAsArray[3] - 3) &&
-                 cardRanksAsArray[0] == (cardRanksAsArray[4] - 4))
+                             (cardRanksAsArray[0] == (cardRanksAsArray[1] - 1) &&
+                              cardRanksAsArray[0] == (cardRanksAsArray[2] - 2) &&
+                              cardRanksAsArray[0] == (cardRanksAsArray[3] - 3) &&
+                              cardRanksAsArray[0] == (cardRanksAsArray[4] - 4))
                 ;
 
             HandOrder handOrder;
@@ -248,7 +252,7 @@ namespace CH.Poker
                 {
                     handOrder = HandOrder.StraightFlush;
                 }
-                else if(isFlush)
+                else if (isFlush)
                 {
                     handOrder = HandOrder.Flush;
                 }
@@ -262,7 +266,7 @@ namespace CH.Poker
             // hand order in the most significate bits, and the each card rank following
             // on in order of importance to the comparison.
             return
-                ((int)handOrder) << 20
+                ((int) handOrder) << 20
                 | cardRanksAsArray[0] << 16
                 | cardRanksAsArray[1] << 12
                 | cardRanksAsArray[2] << 8

@@ -93,10 +93,15 @@
 
 	Updating README to help others understand the organization of the code.
 
-19-02-2012T12:00
+21-02-2012T12:00
 
         Add the full ranker over lunch. Tests are not complete yet.
 
-19-02-2012T13:00
+22-02-2012T13:00
 
 	Add more tests. First staight test exposed an issue with a-low staights, so I fixed that. Once again saved by unit tests...
+
+23-02-2012T12:15
+
+        Add mores tests. Two pair tests exposed two bugs in reording the cards that are now fixed.
+

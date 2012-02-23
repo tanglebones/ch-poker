@@ -90,7 +90,7 @@ namespace CH.Poker.Test.SimpleRankerForIq
                 new[] {"JH", "JD", "JS", "5H", "2H"},
                 new[] {"TH", "TD", "TS", "6H", "2H"},
                 new[] {"9H", "9D", "9S", "7H", "2H"},
-                new[] {"8H", "8D", "8S", "8H", "2H"},
+                new[] {"8H", "8D", "8S", "9H", "2H"},
                 new[] {"7H", "7D", "7S", "9H", "2H"},
                 new[] {"6H", "6D", "6S", "TH", "2H"},
                 new[] {"5H", "5D", "5S", "JH", "2H"},

@@ -84,11 +84,11 @@ namespace CH.Poker
                     x=>new[]{x[3],x[4],x[0],x[1],x[2]}, // 1000
                     x=> // 1001
                         CardRank[x[0]]<CardRank[x[3]]
-                        ? x
+                        ? new[]{x[0],x[1],x[3],x[4],x[2]}
                         : new[]{x[3],x[4],x[0],x[1],x[2]},
                     x=> // 1010
                         CardRank[x[1]]<CardRank[x[3]]
-                        ? x
+                        ? new[]{x[1],x[2],x[3],x[4],x[0]}
                         : new[]{x[3],x[4],x[1],x[2],x[0]},
                     x=>x, // 1011
                     x=>new[]{x[2],x[3],x[4],x[0],x[1]}, // 1100
