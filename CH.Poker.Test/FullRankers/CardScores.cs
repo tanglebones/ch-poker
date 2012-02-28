@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace CH.Poker.Test.SimpleRanker
+namespace CH.Poker.Test.FullRankers
 {
     [TestFixture]
     public sealed class CardScores

@@ -48,8 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SimpleRanker\CardScores.cs" />
-    <Compile Include="SimpleRanker\HandScores.cs" />
+    <Compile Include="FullRankers\CardScores.cs" />
+    <Compile Include="FullRankers\HandScores.cs" />
     <Compile Include="SimpleRankerForIq\CardScores.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleRankerForIq\HandScores.cs" />

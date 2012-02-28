@@ -2,56 +2,64 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
-namespace CH.Poker.Test.SimpleRanker
+namespace CH.Poker.Test.FullRankers
 {
     [TestFixture]
     public sealed class HandScores
     {
-        private IEnumerable<int> _fiveOfAKind;
-        private IEnumerable<int> _straightFlush;
-        private IEnumerable<int> _quads;
-        private IEnumerable<int> _fullhouse;
-        private IEnumerable<int> _flush;
-        private IEnumerable<int> _straight;
-        private IEnumerable<int> _trips;
-        private IEnumerable<int> _twoPair;
-        private IEnumerable<int> _pair;
-        private IEnumerable<int> _highcard;
-        private IRanker _ranker;
+        private IEnumerable<string> _fiveOfAKind;
+        private IEnumerable<string> _straightFlush;
+        private IEnumerable<string> _quads;
+        private IEnumerable<string> _fullhouse;
+        private IEnumerable<string> _flush;
+        private IEnumerable<string> _straight;
+        private IEnumerable<string> _trips;
+        private IEnumerable<string> _twoPair;
+        private IEnumerable<string> _pair;
+        private IEnumerable<string> _highcard;
+        private static readonly IEnumerable<IRanker> RankersField;
+        private static IEnumerable<IRanker> Rankers { get { return RankersField; } }
+
+        static HandScores()
+        {
+            RankersField = new IRanker[] {new SimpleRanker(), new TwoPlusTwoRanker()};
+        }
 
         [SetUp]
         public void SetUp()
         {
-            _ranker = new Poker.SimpleRanker();
-            _fiveOfAKind = new[] { "2H", "2D", "2C", "2S", "2H" }.Select(_ranker.ScoreCard);
-            _straightFlush = new[] { "2H", "3H", "5H", "6H", "4H" }.Select(_ranker.ScoreCard);
-            _quads = new[] { "2H", "2D", "2C", "2S", "4H" }.Select(_ranker.ScoreCard);
-            _fullhouse = new[] { "8H", "8D", "8C", "AS", "AH" }.Select(_ranker.ScoreCard);
-            _flush = new[] { "2H", "3H", "5H", "6H", "7H" }.Select(_ranker.ScoreCard);
-            _straight = new[] { "2H", "3H", "5H", "6H", "4C" }.Select(_ranker.ScoreCard);
-            _trips = new[] { "2H", "2D", "2C", "6H", "7H" }.Select(_ranker.ScoreCard);
-            _twoPair = new[] { "2H", "2D", "3C", "3H", "7H" }.Select(_ranker.ScoreCard);
-            _pair = new[] { "2H", "2D", "3C", "6H", "7H" }.Select(_ranker.ScoreCard);
-            _highcard = new[] {"2H", "3D", "9C", "6H", "7H"}.Select(_ranker.ScoreCard);
+            _fiveOfAKind = new[] { "2H", "2D", "2C", "2S", "2H" };
+            _straightFlush = new[] { "2H", "3H", "5H", "6H", "4H" };
+            _quads = new[] { "2H", "2D", "2C", "2S", "4H" };
+            _fullhouse = new[] { "8H", "8D", "8C", "AS", "AH" };
+            _flush = new[] { "2H", "3H", "5H", "6H", "7H" };
+            _straight = new[] { "2H", "3H", "5H", "6H", "4C" };
+            _trips = new[] { "2H", "2D", "2C", "6H", "7H" };
+            _twoPair = new[] { "2H", "2D", "3C", "3H", "7H" };
+            _pair = new[] { "2H", "2D", "3C", "6H", "7H" };
+            _highcard = new[] {"2H", "3D", "9C", "6H", "7H"};
         }
 
         [Test]
-        public void HandsOrderComparisonsAreCorrect()
+        [TestCaseSource(typeof(HandScores),"Rankers")]
+        public void HandsOrderComparisonsAreCorrect(IRanker ranker)
         {
             var scores =
                 new[]
                     {
-                        _ranker.ScoreHand(_fiveOfAKind),
-                        _ranker.ScoreHand(_straightFlush),
-                        _ranker.ScoreHand(_quads),
-                        _ranker.ScoreHand(_fullhouse),
-                        _ranker.ScoreHand(_flush),
-                        _ranker.ScoreHand(_straight),
-                        _ranker.ScoreHand(_trips),
-                        _ranker.ScoreHand(_twoPair),
-                        _ranker.ScoreHand(_pair),
-                        _ranker.ScoreHand(_highcard)
-                    };
+                        _fiveOfAKind,
+                        _straightFlush,
+                        _quads,
+                        _fullhouse,
+                        _flush,
+                        _straight,
+                        _trips,
+                        _twoPair,
+                        _pair,
+                        _highcard
+                    }
+                    .Select(hand=>ranker.ScoreHand(hand.Select(ranker.ScoreCard)))
+                    .ToArray();
             var set = new HashSet<int>();
             foreach(var score in scores) set.Add(score);
             Assert.That(set.Count, Is.EqualTo(scores.Length)); // unique scores
@@ -60,44 +68,45 @@ namespace CH.Poker.Test.SimpleRanker
         }
 
         [Test]
-        public void CardOrderDoesNotChangeResultingScore()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void CardOrderDoesNotChangeResultingScore(IRanker ranker)
         {
             foreach (var hand in new[] {_fiveOfAKind, _straightFlush, _quads, _fullhouse, _flush, _straight, _trips, _twoPair, _pair, _highcard})
             {
-                var concHand = hand.ToArray();
-                var score = _ranker.ScoreHand(concHand);
+                var concHand = hand.Select(ranker.ScoreCard).ToArray();
+                var score = ranker.ScoreHand(concHand);
                 var permutations = Permute(concHand).ToArray();
 
                 // test would silently fail if permute returned an empty set, so make sure it doesn't.
                 Assert.That(permutations.Length, Is.GreaterThan(0));
 
                 foreach (var permutation in permutations)
-                    Assert.That(_ranker.ScoreHand(permutation), Is.EqualTo(score));
+                    Assert.That(ranker.ScoreHand(permutation), Is.EqualTo(score));
             }
         }
 
-        private void HandsAreInOrder(params IEnumerable<string>[] hands)
+        private static void HandsAreInOrder(IRanker ranker, params IEnumerable<string>[] hands)
         {
-            HandsAreInOrder(hands.AsEnumerable());
+            HandsAreInOrder(ranker, hands.AsEnumerable());
         }
 
-        private void HandsAreInOrder(IEnumerable<IEnumerable<string>> hands)
+        private static void HandsAreInOrder(IRanker ranker, IEnumerable<IEnumerable<string>> hands)
         {
-            var convertedHands = hands.Select(hand => hand.Select(_ranker.ScoreCard));
+            var convertedHands = hands.Select(hand => hand.Select(ranker.ScoreCard));
 
-            var scored = convertedHands.Select(_ranker.ScoreHand).ToArray();
+            var scored = convertedHands.Select(ranker.ScoreHand).ToArray();
             var sorted = scored.OrderBy(score => score).ToArray();
             Assert.That(scored.SequenceEqual(sorted));
         }
 
-        private void HandsAreEqual(params IEnumerable<string>[] hands)
+        private static void HandsAreEqual(IRanker ranker, params IEnumerable<string>[] hands)
         {
-            HandsAreEqual(hands.AsEnumerable());
+            HandsAreEqual(ranker, hands.AsEnumerable());
         }
 
-        private void HandsAreEqual(IEnumerable<IEnumerable<string>> hands)
+        private static void HandsAreEqual(IRanker ranker, IEnumerable<IEnumerable<string>> hands)
         {
-            var convertedHands = hands.Select(hand => _ranker.ScoreHand(hand.Select(_ranker.ScoreCard))).ToArray();
+            var convertedHands = hands.Select(hand => ranker.ScoreHand(hand.Select(ranker.ScoreCard))).ToArray();
             Assert.That(convertedHands.Length,Is.GreaterThan(1));
             var first = convertedHands[0];
             for(var i=1;i<convertedHands.Length;++i)
@@ -106,9 +115,11 @@ namespace CH.Poker.Test.SimpleRanker
 
 
         [Test]
-        public void ComparingFiveOfAKindsGoesToTheHigherFiveOfAKind()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void ComparingFiveOfAKindsGoesToTheHigherFiveOfAKind(IRanker ranker)
         {
             HandsAreInOrder(
+                ranker,
                 new[] { "AH", "AD", "AC", "AS", "AH" },
                 new[] { "KH", "KD", "KC", "KS", "KH" },
                 new[] { "QH", "QD", "QC", "QS", "QH" },
@@ -126,9 +137,11 @@ namespace CH.Poker.Test.SimpleRanker
         }
 
         [Test]
-        public void ComparingStraightFlushesGoesToTheHigherStraightFlush()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void ComparingStraightFlushesGoesToTheHigherStraightFlush(IRanker ranker)
         {
             HandsAreInOrder(
+                ranker,
                 new[] { "AS", "KS", "QS", "JS", "TS" },
                 new[] { "KS", "QS", "JS", "TS", "9S" },
                 new[] { "QS", "JS", "TS", "9S", "8S" },
@@ -143,7 +156,8 @@ namespace CH.Poker.Test.SimpleRanker
         }
 
         [Test]
-        public void DifferentSuitedStraightFlushesAreEqual()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void DifferentSuitedStraightFlushesAreEqual(IRanker ranker)
         {
             var ranks = new[] {'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'};
             var suits = new[] {'H', 'C', 'D', 'S'};
@@ -152,14 +166,16 @@ namespace CH.Poker.Test.SimpleRanker
             {
                 var skip = rankSkip; // avoid access to modified closure warning
                 var hands = suits.Select(suit => ranks.Skip(skip).Take(5).Select(rank => new string(new[] {rank, suit})));
-                HandsAreEqual(hands);
+                HandsAreEqual(ranker, hands);
             }
         }
 
         [Test]
-        public void ComparingQuadsGoesToTheHigherQuads()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void ComparingQuadsGoesToTheHigherQuads(IRanker ranker)
         {
             HandsAreInOrder(
+                ranker,
                 new[] { "AH", "AD", "AC", "AS", "2H" },
                 new[] { "KH", "KD", "KC", "KS", "3H" },
                 new[] { "QH", "QD", "QC", "QS", "4H" },
@@ -177,9 +193,11 @@ namespace CH.Poker.Test.SimpleRanker
         }
 
         [Test]
-        public void ComparingFullHouseGoesToTheHigherFullHouse()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void ComparingFullHouseGoesToTheHigherFullHouse(IRanker ranker)
         {
             HandsAreInOrder(
+                ranker,
                 new[] { "AH", "AD", "AS", "3H", "3D" },
                 new[] { "KH", "KD", "KS", "2H", "2D" },
                 new[] { "QH", "QD", "QS", "4H", "4D" },
@@ -197,9 +215,11 @@ namespace CH.Poker.Test.SimpleRanker
         }
 
         [Test]
-        public void ComparingFlushesGoesToTheHigherFlush()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void ComparingFlushesGoesToTheHigherFlush(IRanker ranker)
         {
             HandsAreInOrder(
+                ranker,
                 new[] {"AH", "KH", "QH", "JH", "2H"},
                 new[] {"AH", "KH", "QH", "3H", "2H"},
                 new[] {"AH", "KH", "4H", "3H", "2H"},
@@ -209,9 +229,11 @@ namespace CH.Poker.Test.SimpleRanker
         }
 
         [Test]
-        public void ComparingStraightGoesToTheHigherStraight()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void ComparingStraightGoesToTheHigherStraight(IRanker ranker)
         {
             HandsAreInOrder(
+                ranker,
                 new[] { "AS", "KS", "QS", "JS", "TC" },
                 new[] { "KS", "QS", "JS", "TS", "9C" },
                 new[] { "QS", "JS", "TS", "9S", "8C" },
@@ -226,9 +248,11 @@ namespace CH.Poker.Test.SimpleRanker
         }
 
         [Test]
-        public void ComparingTripsGoesToTheHigherTrip()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void ComparingTripsGoesToTheHigherTrip(IRanker ranker)
         {
             HandsAreInOrder(
+                ranker,
                 new[] {"AH", "AD", "AS", "3H", "2H"},
                 new[] {"KH", "KD", "KS", "3H", "2H"},
                 new[] {"QH", "QD", "QS", "4H", "2H"},
@@ -245,13 +269,12 @@ namespace CH.Poker.Test.SimpleRanker
                 );
         }
 
-        // TODO: Two pair tests
-        //   - include 99664 vs 88774, i.e. that the highest pair wins.
-
         [Test]
-        public void SortOrderOfTwoPairCasesDoesNotChangeScore()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void SortOrderOfTwoPairCasesDoesNotChangeScore(IRanker ranker)
         {
             HandsAreInOrder(
+                ranker,
                 new[] {"8H", "8D", "9S", "3D", "3H"},
                 new[] {"8H", "8D", "6S", "3D", "3H"},
                 new[] {"8H", "8D", "2S", "3D", "3H"}
@@ -259,9 +282,11 @@ namespace CH.Poker.Test.SimpleRanker
         }
 
         [Test]
-        public void ComparingTwoPairsGoesToTheHigherTwoPair()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void ComparingTwoPairsGoesToTheHigherTwoPair(IRanker ranker)
         {
             HandsAreInOrder(
+                ranker,
                 new[] { "AH", "AD", "2S", "2H", "3H" },
                 new[] { "KH", "KD", "3S", "3H", "2H" },
                 new[] { "QH", "QD", "4S", "4H", "2H" },
@@ -278,9 +303,11 @@ namespace CH.Poker.Test.SimpleRanker
         }
 
         [Test]
-        public void ComparingPairsGoesToTheHigherPair()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void ComparingPairsGoesToTheHigherPair(IRanker ranker)
         {
             HandsAreInOrder(
+                ranker,
                 new[] {"AH", "AD", "2S", "JH", "3H"},
                 new[] {"KH", "KD", "3S", "JH", "2H"},
                 new[] {"QH", "QD", "4S", "JH", "2H"},
@@ -298,9 +325,11 @@ namespace CH.Poker.Test.SimpleRanker
         }
 
         [Test]
-        public void ComparingHighcardGoesToTheHigherCard()
+        [TestCaseSource(typeof(HandScores), "Rankers")]
+        public void ComparingHighcardGoesToTheHigherCard(IRanker ranker)
         {
             HandsAreInOrder(
+                ranker,
                 new[] { "AH", "KD", "QS", "3H", "2H" },
                 new[] { "KH", "QD", "JS", "3H", "2H" },
                 new[] { "QH", "JD", "TS", "4H", "2H" },
@@ -337,7 +366,7 @@ namespace CH.Poker.Test.SimpleRanker
         }
 
         [Test]
-        public void PermuteIsCorrectForFourElements()
+        public void PermuteIsCorrectForFourElements(IRanker ranker)
         {
             var set = new HashSet<string>();
             foreach (var permutation in Permute(new[] {'a', 'b', 'c', 'd'}))
