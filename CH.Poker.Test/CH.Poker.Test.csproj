@@ -50,9 +50,7 @@
   <ItemGroup>
     <Compile Include="SimpleRanker\CardScores.cs" />
     <Compile Include="SimpleRanker\HandScores.cs" />
-    <Compile Include="SimpleRankerForIq\CardScores.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleRankerForIq\HandScores.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CH.Poker\CH.Poker.csproj">
