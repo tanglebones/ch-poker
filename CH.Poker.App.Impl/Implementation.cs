@@ -7,7 +7,7 @@ namespace CH.Poker.App.Impl
 {
     public static class Implementation
     {
-        private static readonly IRanker Ranker = new SimpleRankerForIq();
+        private static readonly IRanker Ranker = new SimpleRanker();
 
         internal static void Run(TextReader inputTextReader, TextWriter outputTextWriter, TextWriter errorTextWriter)
         {
