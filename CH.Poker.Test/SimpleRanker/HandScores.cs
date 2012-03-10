@@ -245,9 +245,6 @@ namespace CH.Poker.Test.SimpleRanker
                 );
         }
 
-        // TODO: Two pair tests
-        //   - include 99664 vs 88774, i.e. that the highest pair wins.
-
         [Test]
         public void SortOrderOfTwoPairCasesDoesNotChangeScore()
         {

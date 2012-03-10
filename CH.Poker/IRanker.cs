@@ -20,8 +20,8 @@ namespace CH.Poker
         /// <summary>
         /// Maps an array of at least five cards (some implementations may support up to seven cards, creating the base five card hand from the seven) and returns a numberic score for the hand that can be used to compare hands. Lower scores are better.
         /// </summary>
-        /// <param name="cards">The cards in the hand, as scored by ScoreCard</param>
+        /// <param name="ranks">The cards in the hand, as scored by ScoreCard</param>
         /// <returns>A score for the hand, lower being better, that can be used to compare the hard with other hands.</returns>
-        int ScoreHand(IEnumerable<int> cards);
+        int ScoreHand(IEnumerable<int> ranks);
     }
 }
