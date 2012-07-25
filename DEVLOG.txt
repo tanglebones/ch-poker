@@ -95,7 +95,7 @@
 
 21-02-2012T12:00
 
-        Add the full ranker over lunch. Tests are not complete yet.
+    Add the full ranker over lunch. Tests are not complete yet.
 
 22-02-2012T13:00
 
@@ -103,5 +103,8 @@
 
 23-02-2012T12:15
 
-        Add mores tests. Two pair tests exposed two bugs in reording the cards that are now fixed.
+    Add mores tests. Two pair tests exposed two bugs in reording the cards that are now fixed.
 
+25-07-2012T12:37
+
+	Working on finishing the 2+2 ranker

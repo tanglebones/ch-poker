@@ -4,15 +4,17 @@ namespace CH.Poker.App.Impl
 {
     internal sealed class Hand : IHand
     {
-        private int _score = int.MaxValue;
-        private readonly string _owner;
         private readonly IEnumerable<string> _cards;
+        private readonly string _owner;
+        private int _score = int.MaxValue;
 
         public Hand(string owner, IEnumerable<string> cards)
         {
             _owner = owner;
             _cards = cards;
         }
+
+        #region IHand Members
 
         public int Score
         {
@@ -29,5 +31,7 @@ namespace CH.Poker.App.Impl
         {
             get { return _cards; }
         }
+
+        #endregion
     }
 }

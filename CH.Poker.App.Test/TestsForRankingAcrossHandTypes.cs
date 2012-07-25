@@ -4,6 +4,8 @@ namespace CH.Poker.App.Test
 {
     internal class TestsForRankingAcrossHandTypes : ITestCaseProvider
     {
+        #region ITestCaseProvider Members
+
         public IEnumerable<ITestCase> Cases
         {
             get
@@ -175,5 +177,7 @@ namespace CH.Poker.App.Test
                         );
             }
         }
+
+        #endregion
     }
 }

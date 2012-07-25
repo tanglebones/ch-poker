@@ -4,6 +4,8 @@ namespace CH.Poker.App.Test
 {
     internal class TestsForIncorrectNumberOfFields : ITestCaseProvider
     {
+        #region ITestCaseProvider Members
+
         public IEnumerable<ITestCase> Cases
         {
             get
@@ -25,5 +27,7 @@ namespace CH.Poker.App.Test
                             Output.Contains("exactly 6 fields"));
             }
         }
+
+        #endregion
     }
 }

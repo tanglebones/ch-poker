@@ -48,8 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FullRankers\CardScores.cs" />
-    <Compile Include="FullRankers\HandScores.cs" />
+    <Compile Include="CardScores.cs" />
+    <Compile Include="HandScores.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

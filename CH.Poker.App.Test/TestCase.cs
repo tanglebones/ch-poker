@@ -5,10 +5,10 @@ namespace CH.Poker.App.Test
 {
     internal sealed class TestCase : ITestCase
     {
-        private readonly string _testName;
-        private readonly IEnumerable<string> _inputLines;
-        private readonly IEnumerable<string> _expectedOutputLines;
         private readonly Func<IEnumerable<string>, string> _checker;
+        private readonly IEnumerable<string> _expectedOutputLines;
+        private readonly IEnumerable<string> _inputLines;
+        private readonly string _testName;
 
         public TestCase(string testName, IEnumerable<string> inputLines, IEnumerable<string> expectedOutputLines)
         {
@@ -25,6 +25,13 @@ namespace CH.Poker.App.Test
             _checker = checker;
         }
 
+        public IEnumerable<string> ExpectedOutputLines
+        {
+            get { return _expectedOutputLines; }
+        }
+
+        #region ITestCase Members
+
         public string TestName
         {
             get { return _testName; }
@@ -40,10 +47,7 @@ namespace CH.Poker.App.Test
             get { return _checker; }
         }
 
-        public IEnumerable<string> ExpectedOutputLines
-        {
-            get { return _expectedOutputLines; }
-        }
+        #endregion
 
         private string DefaultChecker(IEnumerable<string> outputLines)
         {

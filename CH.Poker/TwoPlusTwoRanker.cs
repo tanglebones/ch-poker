@@ -22,44 +22,28 @@ namespace CH.Poker
             CreateTable();
         }
 
-        private class TableInfo
+        #region IRanker Members
+
+        public int ScoreCard(string card)
         {
-            private readonly int _hashCode;
-            public char Suit { get; private set; }
-            public char[] Ranks { get; private set; }
-            public int Score { get; set; }
-
-            public TableInfo(char suit, char[] ranks)
-            {
-                Suit = suit;
-                Ranks = ranks;
-                Score = int.MaxValue;
-                _hashCode = new string(new[] {Suit}.Concat(ranks).ToArray()).GetHashCode();
-            }
-
-            public override int GetHashCode()
-            {
-                return _hashCode;
-            }
-
-            static public bool operator==(TableInfo lhs, TableInfo rhs)
-            {
-                if (lhs == null || rhs == null) return false;
-                return lhs._hashCode == rhs._hashCode;
-            }
-            static public bool operator!=(TableInfo lhs, TableInfo rhs)
-            {
-                if (lhs == null && rhs == null) return false;
-                if (lhs == null || rhs == null) return true;
-                return lhs._hashCode != rhs._hashCode;                
-            }
-
-            public override bool Equals(object obj)
-            {
-                return _hashCode == obj.GetHashCode();
-            }
+            return _ranker.ScoreCard(card);
         }
 
+        public int ScoreHand(IEnumerable<int> cards)
+        {
+            Debug.Assert(cards != null);
+            var cardsAsArray = cards.ToArray();
+            Debug.Assert(cardsAsArray.Length == 5);
+            Debug.Assert(cardsAsArray.All(card => ((card >= 0) && (card <= 51))));
+            Debug.Assert(_table != null);
+
+            return
+                _table[
+                    _table[_table[_table[_table[cardsAsArray[0]] + cardsAsArray[1]] + cardsAsArray[2]] + cardsAsArray[3]
+                        ] + cardsAsArray[4]];
+        }
+
+        #endregion
 
         private void CreateTable()
         {
@@ -116,7 +100,7 @@ namespace CH.Poker
                         var rank = state.Ranks[index];
                         var suit = 'H';
                         if (index == 0) suit = 'D';
-                        cardScores.Add(_ranker.ScoreCard(new string(new[]{rank,suit})));
+                        cardScores.Add(_ranker.ScoreCard(new string(new[] {rank, suit})));
                     }
                     state.Score = _ranker.ScoreHand(cardScores);
                 }
@@ -133,23 +117,48 @@ namespace CH.Poker
             throw new NotImplementedException();
         }
 
-        public int ScoreCard(string card)
+        #region Nested type: TableInfo
+
+        private class TableInfo
         {
-            return _ranker.ScoreCard(card);
+            private readonly int _hashCode;
+
+            public TableInfo(char suit, char[] ranks)
+            {
+                Suit = suit;
+                Ranks = ranks;
+                Score = int.MaxValue;
+                _hashCode = new string(new[] {Suit}.Concat(ranks).ToArray()).GetHashCode();
+            }
+
+            public char Suit { get; private set; }
+            public char[] Ranks { get; private set; }
+            public int Score { get; set; }
+
+            public override int GetHashCode()
+            {
+                return _hashCode;
+            }
+
+            public static bool operator ==(TableInfo lhs, TableInfo rhs)
+            {
+                if (lhs == null || rhs == null) return false;
+                return lhs._hashCode == rhs._hashCode;
+            }
+
+            public static bool operator !=(TableInfo lhs, TableInfo rhs)
+            {
+                if (lhs == null && rhs == null) return false;
+                if (lhs == null || rhs == null) return true;
+                return lhs._hashCode != rhs._hashCode;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return _hashCode == obj.GetHashCode();
+            }
         }
 
-        public int ScoreHand(IEnumerable<int> cards)
-        {
-            Debug.Assert(cards != null);
-            var cardsAsArray = cards.ToArray();
-            Debug.Assert(cardsAsArray.Length == 5);
-            Debug.Assert(cardsAsArray.All(card => ((card >= 0) && (card <= 51))));
-            Debug.Assert(_table != null);
-
-            return
-                _table[
-                    _table[_table[_table[_table[cardsAsArray[0]] + cardsAsArray[1]] + cardsAsArray[2]] + cardsAsArray[3]
-                        ] + cardsAsArray[4]];
-        }
+        #endregion
     }
 }

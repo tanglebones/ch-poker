@@ -8,6 +8,38 @@ namespace CH.Poker.App.Impl
     public static class Implementation
     {
         private static readonly IRanker Ranker = new SimpleRanker();
+        private static readonly char[] ValidRanks;
+        private static readonly char[] ValidSuits;
+
+        static Implementation()
+        {
+            ValidRanks =
+                new[]
+                    {
+                        '2',
+                        '3',
+                        '4',
+                        '5',
+                        '6',
+                        '7',
+                        '8',
+                        '9',
+                        'T',
+                        'J',
+                        'Q',
+                        'K',
+                        'A',
+                    };
+
+            ValidSuits =
+                new[]
+                    {
+                        'H',
+                        'D',
+                        'S',
+                        'C',
+                    };
+        }
 
         internal static void Run(TextReader inputTextReader, TextWriter outputTextWriter, TextWriter errorTextWriter)
         {
@@ -45,9 +77,6 @@ namespace CH.Poker.App.Impl
         {
             return Ranker.ScoreHand(hand.Cards.Select(card => Ranker.ScoreCard(card)));
         }
-
-        private static readonly char[] ValidRanks;
-        private static readonly char[] ValidSuits;
 
         private static IEnumerable<IHand> ParseHands(TextReader inputTextReader)
         {
@@ -94,7 +123,7 @@ namespace CH.Poker.App.Impl
         private static IEnumerable<string> ParseCards(int lineNumber, IEnumerable<string> fields)
         {
             var seenPreviously = new HashSet<string>();
-            var cards = fields.Skip(1).Select(card => card.Replace("10","T").ToUpperInvariant()).ToArray();
+            var cards = fields.Skip(1).Select(card => card.Replace("10", "T").ToUpperInvariant()).ToArray();
 
             var cardErrors = new List<string>();
             foreach (var card in cards)
@@ -130,36 +159,6 @@ namespace CH.Poker.App.Impl
                     String.Join(Environment.NewLine + "\t", cardErrors)
                     );
             return cards;
-        }
-
-        static Implementation()
-        {
-            ValidRanks =
-                new[]
-                    {
-                        '2',
-                        '3',
-                        '4',
-                        '5',
-                        '6',
-                        '7',
-                        '8',
-                        '9',
-                        'T',
-                        'J',
-                        'Q',
-                        'K',
-                        'A',
-                    };
-
-            ValidSuits =
-                new[]
-                    {
-                        'H',
-                        'D',
-                        'S',
-                        'C',
-                    };
         }
     }
 }

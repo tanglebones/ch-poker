@@ -1,27 +1,31 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace CH.Poker.Test.FullRankers
+namespace CH.Poker.Test
 {
     [TestFixture]
     public sealed class CardScores
     {
-        private readonly ISet<int> _scores = new HashSet<int>();
-        private readonly Poker.SimpleRanker _ranker = new Poker.SimpleRanker();
+        #region Setup/Teardown
 
         [SetUp]
         public void SetUp()
         {
             // Also ensures card map to unique values
-            foreach (var suit in new[] { 'H', 'D', 'C', 'S' })
-                foreach (var rank in new[] { '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A' })
+            foreach (var suit in new[] {'H', 'D', 'C', 'S'})
+                foreach (var rank in new[] {'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'})
                 {
-                    var card = new string(new[] { rank, suit });
+                    var card = new string(new[] {rank, suit});
                     var score = _ranker.ScoreCard(card);
                     Assert.That(_scores, Is.Not.Member(_scores));
                     _scores.Add(score);
                 }
         }
+
+        #endregion
+
+        private readonly ISet<int> _scores = new HashSet<int>();
+        private readonly SimpleRanker _ranker = new SimpleRanker();
 
         [Test]
         public void AreInDocumentedRange()

@@ -32,42 +32,6 @@ namespace CH.Poker.App.Test
         }
 
         [Test]
-        [TestCaseSource(typeof(Driver), "Cases")]
-        public static void ExecuteTestCasesViaInternalRun(ITestCase testCase)
-        {
-            var inputTextReader = new StringReader(string.Join(Environment.NewLine, testCase.InputLines));
-            var outputTextStringBuilder = new StringBuilder();
-            var outputTextWriter = new StringWriter(outputTextStringBuilder);
-            var errorTextStringBuilder = new StringBuilder();
-            var errorTextWriter = new StringWriter(errorTextStringBuilder);
-            try
-            {
-                Implementation.Run(inputTextReader, outputTextWriter, errorTextWriter);
-
-                var errors = errorTextStringBuilder.ToString();
-                if (!string.IsNullOrEmpty(errors))
-                {
-                    Debug.WriteLine(errors);
-                    Assert.Fail("Program failed with an error.");
-                }
-                var outputLines = outputTextStringBuilder.ToString().Split(new []{Environment.NewLine}, StringSplitOptions.None);
-
-                var result = testCase.Checker(outputLines);
-                if (result == null) return;
-
-                Debug.WriteLine("Output: ");
-                Debug.WriteLine(string.Join(Environment.NewLine, outputLines));
-                Assert.Fail(result);
-            }
-            finally
-            {
-                outputTextWriter.Dispose();
-                errorTextWriter.Dispose();
-                inputTextReader.Dispose();
-            }
-        }
-
-        [Test]
         [TestCaseSource(typeof (Driver), "Cases")]
         public static void ExecuteTestCasesViaConsoleApp(ITestCase testCase)
         {
@@ -105,7 +69,7 @@ namespace CH.Poker.App.Test
                 if (outputLine == null) break;
                 outputLines.Add(outputLine);
             }
-            
+
             p.Dispose();
 
             var result = testCase.Checker(outputLines);
@@ -114,6 +78,43 @@ namespace CH.Poker.App.Test
             Debug.WriteLine("Output: ");
             Debug.WriteLine(string.Join(Environment.NewLine, outputLines));
             Assert.Fail(result);
+        }
+
+        [Test]
+        [TestCaseSource(typeof (Driver), "Cases")]
+        public static void ExecuteTestCasesViaInternalRun(ITestCase testCase)
+        {
+            var inputTextReader = new StringReader(string.Join(Environment.NewLine, testCase.InputLines));
+            var outputTextStringBuilder = new StringBuilder();
+            var outputTextWriter = new StringWriter(outputTextStringBuilder);
+            var errorTextStringBuilder = new StringBuilder();
+            var errorTextWriter = new StringWriter(errorTextStringBuilder);
+            try
+            {
+                Implementation.Run(inputTextReader, outputTextWriter, errorTextWriter);
+
+                var errors = errorTextStringBuilder.ToString();
+                if (!string.IsNullOrEmpty(errors))
+                {
+                    Debug.WriteLine(errors);
+                    Assert.Fail("Program failed with an error.");
+                }
+                var outputLines = outputTextStringBuilder.ToString().Split(new[] {Environment.NewLine},
+                                                                           StringSplitOptions.None);
+
+                var result = testCase.Checker(outputLines);
+                if (result == null) return;
+
+                Debug.WriteLine("Output: ");
+                Debug.WriteLine(string.Join(Environment.NewLine, outputLines));
+                Assert.Fail(result);
+            }
+            finally
+            {
+                outputTextWriter.Dispose();
+                errorTextWriter.Dispose();
+                inputTextReader.Dispose();
+            }
         }
     }
 }
