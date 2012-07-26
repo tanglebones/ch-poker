@@ -30,7 +30,6 @@ namespace CH.Poker.App.Test
             get { return _expectedOutputLines; }
         }
 
-        #region ITestCase Members
 
         public string TestName
         {
@@ -47,7 +46,6 @@ namespace CH.Poker.App.Test
             get { return _checker; }
         }
 
-        #endregion
 
         private string DefaultChecker(IEnumerable<string> outputLines)
         {

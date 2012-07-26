@@ -5,7 +5,7 @@ namespace CH.Poker.App.Test
 {
     internal class TestsForInvalidCards : ITestCaseProvider
     {
-        #region ITestCaseProvider Members
+
 
         public IEnumerable<ITestCase> Cases
         {
@@ -42,6 +42,5 @@ namespace CH.Poker.App.Test
             }
         }
 
-        #endregion
     }
 }

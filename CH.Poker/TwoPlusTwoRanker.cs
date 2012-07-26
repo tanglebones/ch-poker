@@ -22,7 +22,6 @@ namespace CH.Poker
             CreateTable();
         }
 
-        #region IRanker Members
 
         public int ScoreCard(string card)
         {
@@ -43,11 +42,10 @@ namespace CH.Poker
                         ] + cardsAsArray[4]];
         }
 
-        #endregion
 
         private void CreateTable()
         {
-            var map = new Dictionary<Tuple<TableInfo, char, char>, TableInfo>(); // state + rank + quit -> new state
+            var map = new Dictionary<Tuple<TableInfo, char, char>, TableInfo>(); // state + (rank + suit) -> new state
             var levels =
                 new[]
                     {
@@ -60,6 +58,7 @@ namespace CH.Poker
 
             var suits = new[] {'H', 'D', 'C', 'S'};
             var ranks = new[] {'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'};
+            var cards = ranks.SelectMany(x=>suits, (a,b)=>new string(a,b));
 
             // first card
             foreach (var rank in ranks)
@@ -100,24 +99,43 @@ namespace CH.Poker
                         var rank = state.Ranks[index];
                         var suit = 'H';
                         if (index == 0) suit = 'D';
+                        // score mixed suits (non-flush) by using a Diamond followed by Hearts
                         cardScores.Add(_ranker.ScoreCard(new string(new[] {rank, suit})));
                     }
                     state.Score = _ranker.ScoreHand(cardScores);
                 }
                 else
                 {
+                    // score same suits (flush) by using a all Hearts
                     state.Score =
                         _ranker.ScoreHand(state.Ranks.Select(rank => _ranker.ScoreCard(new string(new[] {rank, 'H'}))));
                 }
             }
 
-            var arraySize = levels.Aggregate(0, (c, x) => c + x.Count);
-            _table = new int[arraySize];
+            int cardCount = cards.Count();
+
+            int location = 0;
+            for (var i = 0; i < levels.Length-1; ++i )
+            {
+                foreach (var entry in levels[i].OrderBy(x => x.Score))
+                {
+                    entry.ArrayLocation = location;
+                    location += cardCount;
+                }
+            }
+
+            foreach(var entry in levels[levels.Length-1].OrderBy(x=>x.Score))
+            {
+                entry.ArrayLocation = location;
+                ++location;
+            }
+
+
+
+            _table = new int[location];
 
             throw new NotImplementedException();
         }
-
-        #region Nested type: TableInfo
 
         private class TableInfo
         {
@@ -134,6 +152,7 @@ namespace CH.Poker
             public char Suit { get; private set; }
             public char[] Ranks { get; private set; }
             public int Score { get; set; }
+            public int ArrayLocation { get; set; }
 
             public override int GetHashCode()
             {
@@ -159,6 +178,5 @@ namespace CH.Poker
             }
         }
 
-        #endregion
     }
 }

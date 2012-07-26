@@ -14,7 +14,6 @@ namespace CH.Poker.App.Impl
             _cards = cards;
         }
 
-        #region IHand Members
 
         public int Score
         {
@@ -32,6 +31,5 @@ namespace CH.Poker.App.Impl
             get { return _cards; }
         }
 
-        #endregion
     }
 }

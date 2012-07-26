@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CH.Poker.App.Impl;
 
 namespace CH.Poker.App

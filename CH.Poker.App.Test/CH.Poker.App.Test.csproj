@@ -38,11 +38,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Driver.cs" />
@@ -64,10 +59,6 @@
     <ProjectReference Include="..\CH.Poker.App.Impl\CH.Poker.App.Impl.csproj">
       <Project>{7CF31A43-852F-4440-9489-0F8843385B3C}</Project>
       <Name>CH.Poker.App.Impl</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CH.Poker.App\CH.Poker.App.csproj">
-      <Project>{0CD85E2C-0953-4232-B8C1-6B87F367F416}</Project>
-      <Name>CH.Poker.App</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

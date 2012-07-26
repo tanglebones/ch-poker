@@ -21,21 +21,21 @@ namespace CH.Poker
         private static readonly IDictionary<char, int> RankToScore =
             new Dictionary<char, int>
                 {
-                    {'a', 13},
                     // low ace
-                    {'2', 12},
-                    {'3', 11},
-                    {'4', 10},
-                    {'5', 9},
-                    {'6', 8},
-                    {'7', 7},
-                    {'8', 6},
-                    {'9', 5},
-                    {'T', 4},
-                    {'J', 3},
-                    {'Q', 2},
-                    {'K', 1},
-                    {'A', 0},
+                    {'a', 0},
+                    {'2', 1},
+                    {'3', 2},
+                    {'4', 3},
+                    {'5', 4},
+                    {'6', 5},
+                    {'7', 6},
+                    {'8', 7},
+                    {'9', 8},
+                    {'T', 9},
+                    {'J', 10},
+                    {'Q', 11},
+                    {'K', 12},
+                    {'A', 13},
                 };
 
         private static readonly int[] CardSuit = new int[52];
@@ -56,58 +56,58 @@ namespace CH.Poker
         private static readonly IDictionary<string, int> CardToScore =
             new Dictionary<string, int>
                 {
-                    {"2H", 51},
-                    {"2D", 50},
-                    {"2C", 49},
-                    {"2S", 48},
-                    {"3H", 47},
-                    {"3D", 46},
-                    {"3C", 45},
-                    {"3S", 44},
-                    {"4H", 43},
-                    {"4D", 42},
-                    {"4C", 41},
-                    {"4S", 40},
-                    {"5H", 39},
-                    {"5D", 38},
-                    {"5C", 37},
-                    {"5S", 36},
-                    {"6H", 35},
-                    {"6D", 34},
-                    {"6C", 33},
-                    {"6S", 32},
-                    {"7H", 31},
-                    {"7D", 30},
-                    {"7C", 29},
-                    {"7S", 28},
-                    {"8H", 27},
-                    {"8D", 26},
-                    {"8C", 25},
-                    {"8S", 24},
-                    {"9H", 23},
-                    {"9D", 22},
-                    {"9C", 21},
-                    {"9S", 20},
-                    {"TH", 19},
-                    {"TD", 18},
-                    {"TC", 17},
-                    {"TS", 16},
-                    {"JH", 15},
-                    {"JD", 14},
-                    {"JC", 13},
-                    {"JS", 12},
-                    {"QH", 11},
-                    {"QD", 10},
-                    {"QC", 9},
-                    {"QS", 8},
-                    {"KH", 7},
-                    {"KD", 6},
-                    {"KC", 5},
-                    {"KS", 4},
-                    {"AH", 3},
-                    {"AD", 2},
-                    {"AC", 1},
-                    {"AS", 0},
+                    {"2H", 0},
+                    {"2D", 1},
+                    {"2C", 2},
+                    {"2S", 3},
+                    {"3H", 4},
+                    {"3D", 5},
+                    {"3C", 6},
+                    {"3S", 7},
+                    {"4H", 8},
+                    {"4D", 9},
+                    {"4C", 10},
+                    {"4S", 11},
+                    {"5H", 12},
+                    {"5D", 13},
+                    {"5C", 14},
+                    {"5S", 15},
+                    {"6H", 16},
+                    {"6D", 17},
+                    {"6C", 18},
+                    {"6S", 19},
+                    {"7H", 20},
+                    {"7D", 21},
+                    {"7C", 22},
+                    {"7S", 23},
+                    {"8H", 24},
+                    {"8D", 25},
+                    {"8C", 26},
+                    {"8S", 27},
+                    {"9H", 28},
+                    {"9D", 29},
+                    {"9C", 30},
+                    {"9S", 31},
+                    {"TH", 32},
+                    {"TD", 33},
+                    {"TC", 34},
+                    {"TS", 35},
+                    {"JH", 36},
+                    {"JD", 37},
+                    {"JC", 38},
+                    {"JS", 39},
+                    {"QH", 40},
+                    {"QD", 41},
+                    {"QC", 42},
+                    {"QS", 43},
+                    {"KH", 44},
+                    {"KD", 45},
+                    {"KC", 46},
+                    {"KS", 47},
+                    {"AH", 48},
+                    {"AD", 49},
+                    {"AC", 50},
+                    {"AS", 51},
                 };
 
         private static readonly int[] AceLowStraightCardRanks =
@@ -116,7 +116,7 @@ namespace CH.Poker
         private static readonly int[] AceLowStraight = AceLowStraightCardRanks.OrderBy(rank => rank).ToArray();
         private static readonly MatchResult NoMatch = new MatchResult(Int32.MaxValue, false);
 
-        private static readonly IHandClassifier[] HandClassifiersInOrder =
+        private static readonly IHandClassifier[] HandClassifiersInReverseOrder =
             new IHandClassifier[]
                 {
                     new FiveOfAKindClassifier(),
@@ -141,7 +141,6 @@ namespace CH.Poker
             }
         }
 
-        #region IRanker Members
 
         public int ScoreCard(string card)
         {
@@ -157,16 +156,15 @@ namespace CH.Poker
             var cardsAsArray = cards.ToArray();
             Debug.Assert(cardsAsArray.Length == 5);
 
-            foreach (var handClassifier in HandClassifiersInOrder)
+            foreach (var handClassifier in HandClassifiersInReverseOrder)
             {
                 var matchResult = handClassifier.Match(cardsAsArray);
                 if (matchResult.Matched)
                     return matchResult.Score;
             }
-            return int.MaxValue;
+            return -1;
         }
 
-        #endregion
 
         private static bool IsHighStraight(IEnumerable<int> ranks)
         {
@@ -189,7 +187,7 @@ namespace CH.Poker
             return suits.GroupBy(suit => suit).Count() == 1;
         }
 
-        internal static int ScoreRanks(IEnumerable<int> ranks, HandOrder handOrder)
+        private static int ScoreRanks(IEnumerable<int> ranks, HandOrder handOrder)
         {
             var ranksAsArray = ranks.ToArray();
             return
@@ -201,15 +199,12 @@ namespace CH.Poker
                 | ranksAsArray[4];
         }
 
-        #region Nested type: FiveOfAKindClassifier
 
         private sealed class FiveOfAKindClassifier : IHandClassifier
         {
-            #region IHandClassifier Members
-
             public IMatchResult Match(IEnumerable<int> cards)
             {
-                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderBy(rank => rank).ToArray();
+                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderByDescending(rank => rank).ToArray();
                 var groupCounts = ranksInOrderAsArray.GroupBy(rank => rank).Select(g => g.Count()).ToArray();
 
                 if (groupCounts.Length == 1)
@@ -217,45 +212,31 @@ namespace CH.Poker
 
                 return NoMatch;
             }
-
-            #endregion
         }
 
-        #endregion
-
-        #region Nested type: FlushClassifier
 
         private sealed class FlushClassifier : IHandClassifier
         {
-            #region IHandClassifier Members
-
             public IMatchResult Match(IEnumerable<int> cards)
             {
                 // cards need to be ordered to allow for comparing flushes.
                 var cardsAsArray = cards.ToArray();
                 var suits = cardsAsArray.Select(card => CardSuit[card]);
-                var ranksInOrderAsArray = cardsAsArray.Select(card => CardRank[card]).OrderBy(rank => rank);
+                var ranksInOrderAsArray = cardsAsArray.Select(card => CardRank[card]).OrderByDescending(rank => rank);
 
                 if (IsFlush(suits))
                     return new MatchResult(ScoreRanks(ranksInOrderAsArray, HandOrder.Flush));
 
                 return NoMatch;
             }
-
-            #endregion
         }
 
-        #endregion
-
-        #region Nested type: FourOfAKindClassifier
 
         private sealed class FourOfAKindClassifier : IHandClassifier
         {
-            #region IHandClassifier Members
-
             public IMatchResult Match(IEnumerable<int> cards)
             {
-                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderBy(rank => rank).ToArray();
+                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderByDescending(rank => rank).ToArray();
                 var groupCounts = ranksInOrderAsArray.GroupBy(rank => rank).Select(g => g.Count()).ToArray();
 
                 if (groupCounts.Length != 2) return NoMatch;
@@ -280,21 +261,14 @@ namespace CH.Poker
 
                 return NoMatch;
             }
-
-            #endregion
         }
 
-        #endregion
-
-        #region Nested type: FullHouseClassifier
 
         private sealed class FullHouseClassifier : IHandClassifier
         {
-            #region IHandClassifier Members
-
             public IMatchResult Match(IEnumerable<int> cards)
             {
-                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderBy(rank => rank).ToArray();
+                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderByDescending(rank => rank).ToArray();
                 var groupCounts = ranksInOrderAsArray.GroupBy(rank => rank).Select(group => group.Count()).ToArray();
 
                 if (groupCounts.Length != 2) return NoMatch;
@@ -320,67 +294,44 @@ namespace CH.Poker
 
                 return NoMatch;
             }
-
-            #endregion
         }
 
-        #endregion
 
-        #region Nested type: HandOrder
-
-        internal enum HandOrder
+        private enum HandOrder
         {
-            FiveOfAKind = 0,
-            StraightFlush = 1,
-            FourOfAKind = 2,
-            FullHouse = 3,
-            Flush = 4,
-            Straight = 5,
-            ThreeOfAKind = 6,
-            TwoPair = 7,
-            OnePair = 8,
-            HighCard = 9
+            FiveOfAKind = 9,
+            StraightFlush = 8,
+            FourOfAKind = 7,
+            FullHouse = 6,
+            Flush = 5,
+            Straight = 4,
+            ThreeOfAKind = 3,
+            TwoPair = 2,
+            OnePair = 1,
+            HighCard = 0
         }
-
-        #endregion
-
-        #region Nested type: HighCardClassifier
 
         private sealed class HighCardClassifier : IHandClassifier
         {
-            #region IHandClassifier Members
-
             public IMatchResult Match(IEnumerable<int> cards)
             {
-                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderBy(rank => rank).ToArray();
+                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderByDescending(rank => rank).ToArray();
                 return new MatchResult(ScoreRanks(ranksInOrderAsArray, HandOrder.HighCard));
             }
-
-            #endregion
         }
 
-        #endregion
-
-        #region Nested type: IHandClassifier
 
         private interface IHandClassifier
         {
             IMatchResult Match(IEnumerable<int> cards);
         }
 
-        #endregion
-
-        #region Nested type: IMatchResult
 
         private interface IMatchResult
         {
             int Score { get; }
             bool Matched { get; }
         }
-
-        #endregion
-
-        #region Nested type: MatchResult
 
         private sealed class MatchResult : IMatchResult
         {
@@ -390,25 +341,15 @@ namespace CH.Poker
                 Matched = matched;
             }
 
-            #region IMatchResult Members
-
             public int Score { get; private set; }
             public bool Matched { get; private set; }
-
-            #endregion
         }
-
-        #endregion
-
-        #region Nested type: PairClassifier
 
         private sealed class PairClassifier : IHandClassifier
         {
-            #region IHandClassifier Members
-
             public IMatchResult Match(IEnumerable<int> cards)
             {
-                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderBy(rank => rank).ToArray();
+                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderByDescending(rank => rank).ToArray();
                 var groupCounts = ranksInOrderAsArray.GroupBy(rank => rank).Select(g => g.Count()).ToArray();
 
                 if (groupCounts.Length != 4) return NoMatch;
@@ -465,22 +406,15 @@ namespace CH.Poker
 
                 return NoMatch;
             }
-
-            #endregion
         }
 
-        #endregion
-
-        #region Nested type: StraightClassifier
 
         private sealed class StraightClassifier : IHandClassifier
         {
-            #region IHandClassifier Members
-
             public IMatchResult Match(IEnumerable<int> cards)
             {
                 var cardsAsArray = cards.ToArray();
-                var ranksInOrderAsArray = cardsAsArray.Select(card => CardRank[card]).OrderBy(rank => rank).ToArray();
+                var ranksInOrderAsArray = cardsAsArray.Select(card => CardRank[card]).OrderByDescending(rank => rank).ToArray();
 
                 if (IsLowStraight(ranksInOrderAsArray))
                     return new MatchResult(ScoreRanks(AceLowStraightCardRanks, HandOrder.Straight));
@@ -490,23 +424,16 @@ namespace CH.Poker
 
                 return NoMatch;
             }
-
-            #endregion
         }
 
-        #endregion
-
-        #region Nested type: StraightFlushClassifier
 
         private sealed class StraightFlushClassifier : IHandClassifier
         {
-            #region IHandClassifier Members
-
             public IMatchResult Match(IEnumerable<int> cards)
             {
                 var cardsAsArray = cards.ToArray();
                 var suits = cardsAsArray.Select(card => CardSuit[card]);
-                var ranksInOrderAsArray = cardsAsArray.Select(card => CardRank[card]).OrderBy(rank => rank).ToArray();
+                var ranksInOrderAsArray = cardsAsArray.Select(card => CardRank[card]).OrderByDescending(rank => rank).ToArray();
 
                 if (IsFlush(suits))
                 {
@@ -518,21 +445,14 @@ namespace CH.Poker
                 }
                 return NoMatch;
             }
-
-            #endregion
         }
 
-        #endregion
-
-        #region Nested type: ThreeOfAKindClassifier
 
         private sealed class ThreeOfAKindClassifier : IHandClassifier
         {
-            #region IHandClassifier Members
-
             public IMatchResult Match(IEnumerable<int> cards)
             {
-                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderBy(rank => rank).ToArray();
+                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderByDescending(rank => rank).ToArray();
                 var groupCounts = ranksInOrderAsArray.GroupBy(rank => rank).Select(g => g.Count()).ToArray();
 
                 if (groupCounts.Length != 3) return NoMatch;
@@ -572,21 +492,14 @@ namespace CH.Poker
 
                 return NoMatch;
             }
-
-            #endregion
         }
 
-        #endregion
-
-        #region Nested type: TwoPairClassifier
 
         private sealed class TwoPairClassifier : IHandClassifier
         {
-            #region IHandClassifier Members
-
             public IMatchResult Match(IEnumerable<int> cards)
             {
-                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderBy(rank => rank).ToArray();
+                var ranksInOrderAsArray = cards.Select(card => CardRank[card]).OrderByDescending(rank => rank).ToArray();
                 var groupCounts = ranksInOrderAsArray.GroupBy(rank => rank).Select(g => g.Count()).ToArray();
 
                 // we know it has to be (1 2 2), (2 1 2), or (2 2 1) because the three of a kind classifier
@@ -629,10 +542,6 @@ namespace CH.Poker
 
                 return NoMatch;
             }
-
-            #endregion
         }
-
-        #endregion
     }
 }

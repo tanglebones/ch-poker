@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -50,7 +50,7 @@ namespace CH.Poker.App.Impl
                 if (hands.Length == 0)
                     throw new InvalidInputException("Error: no input.");
 
-                var winningHand = ScoreHands(hands).OrderBy(hand => hand.Score).First();
+                var winningHand = ScoreHands(hands).OrderByDescending(hand => hand.Score).First();
 
                 outputTextWriter.WriteLine(winningHand.Owner);
             }

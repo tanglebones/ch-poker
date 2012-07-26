@@ -5,7 +5,7 @@ namespace CH.Poker.App.Test
 {
     internal class TestNoInputProducesError : ITestCaseProvider
     {
-        #region ITestCaseProvider Members
+
 
         public IEnumerable<ITestCase> Cases
         {
@@ -20,6 +20,5 @@ namespace CH.Poker.App.Test
             }
         }
 
-        #endregion
     }
 }

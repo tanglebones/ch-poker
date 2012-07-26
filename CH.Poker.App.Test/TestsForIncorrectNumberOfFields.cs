@@ -4,7 +4,7 @@ namespace CH.Poker.App.Test
 {
     internal class TestsForIncorrectNumberOfFields : ITestCaseProvider
     {
-        #region ITestCaseProvider Members
+
 
         public IEnumerable<ITestCase> Cases
         {
@@ -28,6 +28,5 @@ namespace CH.Poker.App.Test
             }
         }
 
-        #endregion
     }
 }

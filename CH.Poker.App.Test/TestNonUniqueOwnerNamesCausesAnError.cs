@@ -5,7 +5,7 @@ namespace CH.Poker.App.Test
 {
     internal class TestNonUniqueOwnerNamesCausesAnError : ITestCaseProvider
     {
-        #region ITestCaseProvider Members
+
 
         public IEnumerable<ITestCase> Cases
         {
@@ -28,6 +28,5 @@ namespace CH.Poker.App.Test
             }
         }
 
-        #endregion
     }
 }

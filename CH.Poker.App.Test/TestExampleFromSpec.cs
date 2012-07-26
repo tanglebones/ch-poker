@@ -4,7 +4,7 @@ namespace CH.Poker.App.Test
 {
     internal class TestExampleFromSpec : ITestCaseProvider
     {
-        #region ITestCaseProvider Members
+
 
         public IEnumerable<ITestCase> Cases
         {
@@ -27,6 +27,5 @@ namespace CH.Poker.App.Test
             }
         }
 
-        #endregion
     }
 }

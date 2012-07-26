@@ -6,36 +6,26 @@ namespace CH.Poker.Test
     [TestFixture]
     public sealed class CardScores
     {
-        #region Setup/Teardown
-
-        [SetUp]
-        public void SetUp()
-        {
-            // Also ensures card map to unique values
-            foreach (var suit in new[] {'H', 'D', 'C', 'S'})
-                foreach (var rank in new[] {'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'})
-                {
-                    var card = new string(new[] {rank, suit});
-                    var score = _ranker.ScoreCard(card);
-                    Assert.That(_scores, Is.Not.Member(_scores));
-                    _scores.Add(score);
-                }
-        }
-
-        #endregion
-
-        private readonly ISet<int> _scores = new HashSet<int>();
-        private readonly SimpleRanker _ranker = new SimpleRanker();
-
         [Test]
-        public void AreInDocumentedRange()
+        public void CardScoresAreValid()
         {
-            Assert.That(_scores.Count, Is.GreaterThan(0));
-            foreach (var score in _scores)
+            foreach (var ranker in _rankers)
             {
-                Assert.That(score, Is.GreaterThanOrEqualTo(0));
-                Assert.That(score, Is.LessThanOrEqualTo(51));
+                // ensure card map to unique values
+                var scores = new HashSet<int>();
+                foreach (var suit in new[] {'H', 'D', 'C', 'S'})
+                    foreach (var rank in new[] {'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'})
+                    {
+                        var card = new string(new[] {rank, suit});
+                        var score = ranker.ScoreCard(card);
+                        Assert.That(score, Is.GreaterThanOrEqualTo(0));
+                        Assert.That(score, Is.LessThanOrEqualTo(51));
+                        Assert.That(scores, Is.Not.Member(scores));
+                        scores.Add(score);
+                    }
             }
         }
+
+        private readonly IRanker[] _rankers = new IRanker[] {new SimpleRanker()};//, new TwoPlusTwoRanker()};
     }
 }

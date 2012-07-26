@@ -7,8 +7,6 @@ namespace CH.Poker.Test
     [TestFixture]
     public sealed class HandScores
     {
-        #region Setup/Teardown
-
         [SetUp]
         public void SetUp()
         {
@@ -24,7 +22,6 @@ namespace CH.Poker.Test
             _highcard = new[] {"2H", "3D", "9C", "6H", "7H"};
         }
 
-        #endregion
 
         private IEnumerable<string> _fiveOfAKind;
         private IEnumerable<string> _straightFlush;
@@ -36,35 +33,20 @@ namespace CH.Poker.Test
         private IEnumerable<string> _twoPair;
         private IEnumerable<string> _pair;
         private IEnumerable<string> _highcard;
-        private static readonly IEnumerable<IRanker> RankersField;
+        private static readonly IEnumerable<IRanker> Rankers = new IRanker[] { new SimpleRanker() };//, new TwoPlusTwoRanker()};
 
-        private static IEnumerable<IRanker> Rankers
+        private static void HandsAreInDescendingOrder(IRanker ranker, params IEnumerable<string>[] hands)
         {
-            get { return RankersField; }
+            HandsAreInDescendingOrder(ranker, hands.AsEnumerable());
         }
 
-        static HandScores()
-        {
-            RankersField = new IRanker[] {new SimpleRanker(), new TwoPlusTwoRanker()};
-        }
-
-        private static void HandsAreInOrder(IRanker ranker, params IEnumerable<string>[] hands)
-        {
-            HandsAreInOrder(ranker, hands.AsEnumerable());
-        }
-
-        private static void HandsAreInOrder(IRanker ranker, IEnumerable<IEnumerable<string>> hands)
+        private static void HandsAreInDescendingOrder(IRanker ranker, IEnumerable<IEnumerable<string>> hands)
         {
             var convertedHands = hands.Select(hand => hand.Select(ranker.ScoreCard));
 
             var scored = convertedHands.Select(ranker.ScoreHand).ToArray();
-            var sorted = scored.OrderBy(score => score).ToArray();
+            var sorted = scored.OrderByDescending(score => score).ToArray();
             Assert.That(scored.SequenceEqual(sorted));
-        }
-
-        private static void HandsAreEqual(IRanker ranker, params IEnumerable<string>[] hands)
-        {
-            HandsAreEqual(ranker, hands.AsEnumerable());
         }
 
         private static void HandsAreEqual(IRanker ranker, IEnumerable<IEnumerable<string>> hands)
@@ -125,7 +107,7 @@ namespace CH.Poker.Test
         [TestCaseSource(typeof (HandScores), "Rankers")]
         public void ComparingFiveOfAKindsGoesToTheHigherFiveOfAKind(IRanker ranker)
         {
-            HandsAreInOrder(
+            HandsAreInDescendingOrder(
                 ranker,
                 new[] {"AH", "AD", "AC", "AS", "AH"},
                 new[] {"KH", "KD", "KC", "KS", "KH"},
@@ -147,7 +129,7 @@ namespace CH.Poker.Test
         [TestCaseSource(typeof (HandScores), "Rankers")]
         public void ComparingFlushesGoesToTheHigherFlush(IRanker ranker)
         {
-            HandsAreInOrder(
+            HandsAreInDescendingOrder(
                 ranker,
                 new[] {"AH", "KH", "QH", "JH", "2H"},
                 new[] {"AH", "KH", "QH", "3H", "2H"},
@@ -161,7 +143,7 @@ namespace CH.Poker.Test
         [TestCaseSource(typeof (HandScores), "Rankers")]
         public void ComparingFullHouseGoesToTheHigherFullHouse(IRanker ranker)
         {
-            HandsAreInOrder(
+            HandsAreInDescendingOrder(
                 ranker,
                 new[] {"AH", "AD", "AS", "3H", "3D"},
                 new[] {"KH", "KD", "KS", "2H", "2D"},
@@ -183,7 +165,7 @@ namespace CH.Poker.Test
         [TestCaseSource(typeof (HandScores), "Rankers")]
         public void ComparingHighcardGoesToTheHigherCard(IRanker ranker)
         {
-            HandsAreInOrder(
+            HandsAreInDescendingOrder(
                 ranker,
                 new[] {"AH", "KD", "QS", "3H", "2H"},
                 new[] {"KH", "QD", "JS", "3H", "2H"},
@@ -200,7 +182,7 @@ namespace CH.Poker.Test
         [TestCaseSource(typeof (HandScores), "Rankers")]
         public void ComparingPairsGoesToTheHigherPair(IRanker ranker)
         {
-            HandsAreInOrder(
+            HandsAreInDescendingOrder(
                 ranker,
                 new[] {"AH", "AD", "2S", "JH", "3H"},
                 new[] {"KH", "KD", "3S", "JH", "2H"},
@@ -222,7 +204,7 @@ namespace CH.Poker.Test
         [TestCaseSource(typeof (HandScores), "Rankers")]
         public void ComparingQuadsGoesToTheHigherQuads(IRanker ranker)
         {
-            HandsAreInOrder(
+            HandsAreInDescendingOrder(
                 ranker,
                 new[] {"AH", "AD", "AC", "AS", "2H"},
                 new[] {"KH", "KD", "KC", "KS", "3H"},
@@ -244,7 +226,7 @@ namespace CH.Poker.Test
         [TestCaseSource(typeof (HandScores), "Rankers")]
         public void ComparingStraightFlushesGoesToTheHigherStraightFlush(IRanker ranker)
         {
-            HandsAreInOrder(
+            HandsAreInDescendingOrder(
                 ranker,
                 new[] {"AS", "KS", "QS", "JS", "TS"},
                 new[] {"KS", "QS", "JS", "TS", "9S"},
@@ -263,7 +245,7 @@ namespace CH.Poker.Test
         [TestCaseSource(typeof (HandScores), "Rankers")]
         public void ComparingStraightGoesToTheHigherStraight(IRanker ranker)
         {
-            HandsAreInOrder(
+            HandsAreInDescendingOrder(
                 ranker,
                 new[] {"AS", "KS", "QS", "JS", "TC"},
                 new[] {"KS", "QS", "JS", "TS", "9C"},
@@ -282,7 +264,7 @@ namespace CH.Poker.Test
         [TestCaseSource(typeof (HandScores), "Rankers")]
         public void ComparingTripsGoesToTheHigherTrip(IRanker ranker)
         {
-            HandsAreInOrder(
+            HandsAreInDescendingOrder(
                 ranker,
                 new[] {"AH", "AD", "AS", "3H", "2H"},
                 new[] {"KH", "KD", "KS", "3H", "2H"},
@@ -304,7 +286,7 @@ namespace CH.Poker.Test
         [TestCaseSource(typeof (HandScores), "Rankers")]
         public void ComparingTwoPairsGoesToTheHigherTwoPair(IRanker ranker)
         {
-            HandsAreInOrder(
+            HandsAreInDescendingOrder(
                 ranker,
                 new[] {"AH", "AD", "2S", "2H", "3H"},
                 new[] {"KH", "KD", "3S", "3H", "2H"},
@@ -359,12 +341,12 @@ namespace CH.Poker.Test
             var set = new HashSet<int>();
             foreach (var score in scores) set.Add(score);
             Assert.That(set.Count, Is.EqualTo(scores.Length)); // unique scores
-            var sorted = scores.OrderBy(score => score);
+            var sorted = scores.OrderByDescending(score => score);
             Assert.That(sorted.SequenceEqual(scores));
         }
 
         [Test]
-        public void PermuteIsCorrectForFourElements(IRanker ranker)
+        public void PermuteIsCorrectForFourElements()
         {
             var set = new HashSet<string>();
             foreach (var permutation in Permute(new[] {'a', 'b', 'c', 'd'}))
@@ -378,7 +360,7 @@ namespace CH.Poker.Test
         [TestCaseSource(typeof (HandScores), "Rankers")]
         public void SortOrderOfTwoPairCasesDoesNotChangeScore(IRanker ranker)
         {
-            HandsAreInOrder(
+            HandsAreInDescendingOrder(
                 ranker,
                 new[] {"8H", "8D", "9S", "3D", "3H"},
                 new[] {"8H", "8D", "6S", "3D", "3H"},
