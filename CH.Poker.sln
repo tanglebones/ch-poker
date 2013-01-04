@@ -2,9 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Poker", "CH.Poker\CH.Poker.csproj", "{8043D3D5-A589-4A8F-8133-6FF24F6937EC}"
-	ProjectSection(ProjectDependencies) = postProject
-		{978A76D0-73CB-456F-A5FC-8E258FB4868B} = {978A76D0-73CB-456F-A5FC-8E258FB4868B}
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{20B76700-4783-45AB-AA61-60E517307E60}"
 	ProjectSection(SolutionItems) = preProject
@@ -13,8 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_prebuild", "_prebuild\_prebuild.csproj", "{978A76D0-73CB-456F-A5FC-8E258FB4868B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Poker.Test", "CH.Poker.Test\CH.Poker.Test.csproj", "{89220127-28FC-4AE0-9FEB-0229D52E9599}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Poker.App", "CH.Poker.App\CH.Poker.App.csproj", "{0CD85E2C-0953-4232-B8C1-6B87F367F416}"
@@ -22,6 +17,13 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Poker.App.Test", "CH.Poker.App.Test\CH.Poker.App.Test.csproj", "{A13CCE1A-56F7-40F4-AE30-6642BDD1261B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH.Poker.App.Impl", "CH.Poker.App.Impl\CH.Poker.App.Impl.csproj", "{7CF31A43-852F-4440-9489-0F8843385B3C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B8A7CE6A-FF71-4F83-9DD7-9EF42B7BA9A2}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,16 +45,6 @@ Global
 		{8043D3D5-A589-4A8F-8133-6FF24F6937EC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{8043D3D5-A589-4A8F-8133-6FF24F6937EC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{8043D3D5-A589-4A8F-8133-6FF24F6937EC}.Release|x86.ActiveCfg = Release|Any CPU
-		{978A76D0-73CB-456F-A5FC-8E258FB4868B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{978A76D0-73CB-456F-A5FC-8E258FB4868B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{978A76D0-73CB-456F-A5FC-8E258FB4868B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{978A76D0-73CB-456F-A5FC-8E258FB4868B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{978A76D0-73CB-456F-A5FC-8E258FB4868B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{978A76D0-73CB-456F-A5FC-8E258FB4868B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{978A76D0-73CB-456F-A5FC-8E258FB4868B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{978A76D0-73CB-456F-A5FC-8E258FB4868B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{978A76D0-73CB-456F-A5FC-8E258FB4868B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{978A76D0-73CB-456F-A5FC-8E258FB4868B}.Release|x86.ActiveCfg = Release|Any CPU
 		{89220127-28FC-4AE0-9FEB-0229D52E9599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{89220127-28FC-4AE0-9FEB-0229D52E9599}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89220127-28FC-4AE0-9FEB-0229D52E9599}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

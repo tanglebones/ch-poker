@@ -33,7 +33,7 @@ namespace CH.Poker.Test
         private IEnumerable<string> _twoPair;
         private IEnumerable<string> _pair;
         private IEnumerable<string> _highcard;
-        private static readonly IEnumerable<IRanker> Rankers = new IRanker[] { new SimpleRanker() };//, new TwoPlusTwoRanker()};
+        private static readonly IEnumerable<IRanker> Rankers = new IRanker[] { new SimpleRanker(), new TwoPlusTwoRanker()};
 
         private static void HandsAreInDescendingOrder(IRanker ranker, params IEnumerable<string>[] hands)
         {

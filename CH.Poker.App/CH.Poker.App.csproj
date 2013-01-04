@@ -48,6 +48,10 @@
       <Project>{7CF31A43-852F-4440-9489-0F8843385B3C}</Project>
       <Name>CH.Poker.App.Impl</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CH.Poker\CH.Poker.csproj">
+      <Project>{8043D3D5-A589-4A8F-8133-6FF24F6937EC}</Project>
+      <Name>CH.Poker</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

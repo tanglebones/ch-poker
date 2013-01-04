@@ -9,8 +9,128 @@ namespace CH.Poker
 
     public class TwoPlusTwoRanker : IRanker
     {
+        private const int NoSuit = -1;
+        private const int AnySuit = -2;
+        private const int ScoreOffset = 100000000;
+        private static readonly IDictionary<int, string> ScoreToCard = new Dictionary<int, string>();
+
+        private static readonly IDictionary<char, int> SuitToScore =
+            new Dictionary<char, int>
+                {
+                    {'H', 0},
+                    {'D', 1},
+                    {'C', 2},
+                    {'S', 3},
+                    {'X', NoSuit},
+                    {'*', AnySuit}
+                };
+
+        private static readonly IDictionary<char, int> RankToScore =
+            new Dictionary<char, int>
+                {
+                    // low ace
+                    {'a', 0},
+                    {'2', 1},
+                    {'3', 2},
+                    {'4', 3},
+                    {'5', 4},
+                    {'6', 5},
+                    {'7', 6},
+                    {'8', 7},
+                    {'9', 8},
+                    {'T', 9},
+                    {'J', 10},
+                    {'Q', 11},
+                    {'K', 12},
+                    {'A', 13},
+                };
+
+        private static readonly IDictionary<int, char> ScoreToSuit = new Dictionary<int, char>();
+        private static readonly IDictionary<int, char> ScoreToRank = new Dictionary<int, char>();
+
+        private static readonly int[] CardSuit = new int[52];
+        private static readonly int[] CardRank = new int[52];
+
+        private static readonly IDictionary<string, int> CardToScore =
+            new Dictionary<string, int>
+                {
+                    {"2H", 0},
+                    {"2D", 1},
+                    {"2C", 2},
+                    {"2S", 3},
+                    {"3H", 4},
+                    {"3D", 5},
+                    {"3C", 6},
+                    {"3S", 7},
+                    {"4H", 8},
+                    {"4D", 9},
+                    {"4C", 10},
+                    {"4S", 11},
+                    {"5H", 12},
+                    {"5D", 13},
+                    {"5C", 14},
+                    {"5S", 15},
+                    {"6H", 16},
+                    {"6D", 17},
+                    {"6C", 18},
+                    {"6S", 19},
+                    {"7H", 20},
+                    {"7D", 21},
+                    {"7C", 22},
+                    {"7S", 23},
+                    {"8H", 24},
+                    {"8D", 25},
+                    {"8C", 26},
+                    {"8S", 27},
+                    {"9H", 28},
+                    {"9D", 29},
+                    {"9C", 30},
+                    {"9S", 31},
+                    {"TH", 32},
+                    {"TD", 33},
+                    {"TC", 34},
+                    {"TS", 35},
+                    {"JH", 36},
+                    {"JD", 37},
+                    {"JC", 38},
+                    {"JS", 39},
+                    {"QH", 40},
+                    {"QD", 41},
+                    {"QC", 42},
+                    {"QS", 43},
+                    {"KH", 44},
+                    {"KD", 45},
+                    {"KC", 46},
+                    {"KS", 47},
+                    {"AH", 48},
+                    {"AD", 49},
+                    {"AC", 50},
+                    {"AS", 51},
+                };
+
+        private static readonly int[] Cards;
+
         private readonly IRanker _ranker;
         private int[] _table;
+
+        static TwoPlusTwoRanker()
+        {
+            foreach (var kvp in CardToScore)
+            {
+                ScoreToCard[kvp.Value] = kvp.Key;
+                CardRank[kvp.Value] = RankToScore[kvp.Key[0]];
+                CardSuit[kvp.Value] = SuitToScore[kvp.Key[1]];
+            }
+            foreach (var kvp in RankToScore)
+            {
+                ScoreToRank[kvp.Value] = kvp.Key;
+            }
+            foreach (var kvp in SuitToScore)
+            {
+                ScoreToSuit[kvp.Value] = kvp.Key;
+            }
+            Cards = Enumerable.Range(0, CardToScore.Count).ToArray();
+        }
 
         public TwoPlusTwoRanker() : this(new SimpleRanker())
         {
@@ -36,147 +156,204 @@ namespace CH.Poker
             Debug.Assert(cardsAsArray.All(card => ((card >= 0) && (card <= 51))));
             Debug.Assert(_table != null);
 
-            return
-                _table[
-                    _table[_table[_table[_table[cardsAsArray[0]] + cardsAsArray[1]] + cardsAsArray[2]] + cardsAsArray[3]
-                        ] + cardsAsArray[4]];
+            var hop1 = _table[cardsAsArray[0]];
+            Debug.Assert(hop1 > 0 && hop1 < _table.Length - 52);
+            var hop2 = _table[hop1 + cardsAsArray[1]];
+            Debug.Assert(hop2 > 0 && hop2 < _table.Length - 52);
+            var hop3 = _table[hop2 + cardsAsArray[2]];
+            Debug.Assert(hop3 > 0 && hop3 < _table.Length - 52);
+            var hop4 = _table[hop3 + cardsAsArray[3]];
+            Debug.Assert(hop4 > 0 && hop4 < _table.Length - 52);
+            var hop5 = _table[hop4 + cardsAsArray[4]];
+            Debug.Assert(hop5 > 0 && hop5 < _table.Length);
+            var score = _table[hop5];
+            Debug.Assert(score >= ScoreOffset);
+
+            return score;
         }
 
 
         private void CreateTable()
         {
-            var map = new Dictionary<Tuple<TableInfo, char, char>, TableInfo>(); // state + (rank + suit) -> new state
-            var levels =
-                new[]
-                    {
-                        new HashSet<TableInfo>(),
-                        new HashSet<TableInfo>(),
-                        new HashSet<TableInfo>(),
-                        new HashSet<TableInfo>(),
-                        new HashSet<TableInfo>(),
-                    };
+            var map = new Dictionary<string, TableInfo>(); // state + card -> new state
 
-            var suits = new[] {'H', 'D', 'C', 'S'};
-            var ranks = new[] {'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'};
-            var cards = ranks.SelectMany(x=>suits, (a,b)=>new string(a,b));
+            var root = new TableInfo();
+            map[root.ToString()] = root;
 
-            // first card
-            foreach (var rank in ranks)
-            {
-                foreach (var suit in suits)
+            IList<TableInfo> q = new List<TableInfo>
                 {
-                    levels[0].Add(new TableInfo(suit, new[] {rank}));
-                }
+                    root
+                };
+
+            var location = Cards.Length;
+
+            q = AddLevel(map, q, ref location);
+            q = AddLevel(map, q, ref location);
+            q = AddLevel(map, q, ref location);
+            q = AddLevel(map, q, ref location);
+            AddLevel(map, q, ref location, true);
+
+            Debug.Assert(location < ScoreOffset);
+
+            _table = new int[location];
+            for (var i = 0; i < _table.Length; ++i)
+            {
+                _table[i] = -1;
             }
 
-            foreach (var level in Enumerable.Range(0, levels.Length - 1))
+            foreach (var entry in map.Values)
             {
-                var nextLevel = level + 1;
-                foreach (var state in levels[level])
+                var baseOffset = entry.ArrayLocation;
+                if (entry.Score != -1)
                 {
-                    foreach (var rank in ranks)
-                    {
-                        foreach (var suit in suits)
-                        {
-                            var newSuit = (state.Suit != suit) ? 'X' : state.Suit;
-                            var newRanks = new[] {rank}.Concat(state.Ranks).OrderBy(r => r).ToArray();
-                            var newState = new TableInfo(newSuit, newRanks);
-                            var newLookup = Tuple.Create(new TableInfo(state.Suit, state.Ranks), rank, suit);
-                            map[newLookup] = newState;
-                            levels[nextLevel].Add(newState);
-                        }
-                    }
-                }
-            }
-
-            foreach (var state in levels[levels.Length - 1])
-            {
-                if (state.Suit == 'X')
-                {
-                    var cardScores = new List<int>();
-                    for (var index = 0; index < state.Ranks.Length; index++)
-                    {
-                        var rank = state.Ranks[index];
-                        var suit = 'H';
-                        if (index == 0) suit = 'D';
-                        // score mixed suits (non-flush) by using a Diamond followed by Hearts
-                        cardScores.Add(_ranker.ScoreCard(new string(new[] {rank, suit})));
-                    }
-                    state.Score = _ranker.ScoreHand(cardScores);
+                    Debug.Assert(_table[baseOffset] < 0);
+                    _table[baseOffset] = entry.Score + ScoreOffset;
                 }
                 else
                 {
-                    // score same suits (flush) by using a all Hearts
-                    state.Score =
-                        _ranker.ScoreHand(state.Ranks.Select(rank => _ranker.ScoreCard(new string(new[] {rank, 'H'}))));
+                    for (var i = 0; i < entry.Exits.Length; ++i)
+                    {
+                        var arrayLocation = baseOffset + i;
+                        Debug.Assert(_table[arrayLocation] < 0);
+                        _table[arrayLocation] = entry.Exits[i];
+                    }
                 }
             }
+        }
 
-            int cardCount = cards.Count();
+        private IList<TableInfo> AddLevel(IDictionary<string, TableInfo> map, IList<TableInfo> tableInfos,
+                                          ref int location, bool end = false)
+        {
+            var newQ = new List<TableInfo>();
 
-            int location = 0;
-            for (var i = 0; i < levels.Length-1; ++i )
+            foreach (var entry in tableInfos)
             {
-                foreach (var entry in levels[i].OrderBy(x => x.Score))
+                // for each card added to previous state
+                foreach (var card in Cards)
                 {
-                    entry.ArrayLocation = location;
-                    location += cardCount;
+                    var suit = CardSuit[card];
+                    var rank = CardRank[card];
+
+                    // compute new state
+                    var newSuit = (entry.Suit == AnySuit) ? suit : (entry.Suit != suit) ? NoSuit : suit;
+                    var newRanks = new[] {rank}.Concat(entry.Ranks).OrderBy(r => r).ToArray();
+
+                    var newState = new TableInfo(newRanks, newSuit);
+                    var newLookup = newState.ToString();
+
+                    if (map.ContainsKey(newLookup)) continue;
+
+                    newState.ComputeScore(_ranker);
+                    map[newLookup] = newState;
+                    newQ.Add(newState);
                 }
             }
 
-            foreach(var entry in levels[levels.Length-1].OrderBy(x=>x.Score))
+            newQ.Sort(ByScoreOrString);
+
+            foreach (var newEntry in newQ)
             {
-                entry.ArrayLocation = location;
-                ++location;
+                newEntry.ArrayLocation = location;
+                location += end ? 1 : Cards.Length;
             }
 
+            foreach (var entry in tableInfos)
+            {
+                entry.Exits = new int[Cards.Length];
 
+                // for each card added to previous state
+                foreach (var card in Cards)
+                {
+                    var suit = CardSuit[card];
+                    var rank = CardRank[card];
 
-            _table = new int[location];
+                    // compute new state
+                    var newSuit = (entry.Suit == AnySuit) ? suit : (entry.Suit != suit) ? NoSuit : suit;
+                    var newRanks = new[] {rank}.Concat(entry.Ranks).OrderBy(r => r).ToArray();
 
-            throw new NotImplementedException();
+                    var newLookup = new TableInfo(newRanks, newSuit).ToString();
+
+                    TableInfo newState;
+                    if (map.TryGetValue(newLookup, out newState))
+                    {
+                        entry.Exits[card] = newState.ArrayLocation;
+                    }
+                }
+            }
+
+            return newQ;
+        }
+
+        private static int ByScoreOrString(TableInfo x, TableInfo y)
+        {
+            if (x.Score == -1 && y.Score == -1)
+                return StringComparer.InvariantCultureIgnoreCase.Compare(x.ToString(), y.ToString());
+            return x.Score - y.Score;
         }
 
         private class TableInfo
         {
-            private readonly int _hashCode;
+            private string _toString;
 
-            public TableInfo(char suit, char[] ranks)
+            public TableInfo()
+            {
+                _toString = string.Empty;
+                Score = -1;
+                Suit = AnySuit;
+                Ranks = new int[] {};
+                ArrayLocation = 0;
+            }
+
+            public TableInfo(int[] ranks, int suit)
             {
                 Suit = suit;
                 Ranks = ranks;
-                Score = int.MaxValue;
-                _hashCode = new string(new[] {Suit}.Concat(ranks).ToArray()).GetHashCode();
+                Score = -1;
+                ArrayLocation = -1;
+                Exits = null;
             }
 
-            public char Suit { get; private set; }
-            public char[] Ranks { get; private set; }
-            public int Score { get; set; }
+            public int Suit { get; private set; }
+            public int[] Ranks { get; private set; }
+            public int Score { get; private set; }
             public int ArrayLocation { get; set; }
+            public int[] Exits { get; set; }
 
-            public override int GetHashCode()
+            public override string ToString()
             {
-                return _hashCode;
+                return _toString ??
+                       (_toString =
+                        ((Suit == -1) ? 'X' : ScoreToSuit[Suit]) +
+                        String.Join(string.Empty, Ranks.Select(r => ScoreToRank[r])));
             }
 
-            public static bool operator ==(TableInfo lhs, TableInfo rhs)
+            public void ComputeScore(IRanker ranker)
             {
-                if (lhs == null || rhs == null) return false;
-                return lhs._hashCode == rhs._hashCode;
-            }
+                if (Ranks.Length != 5)
+                    return;
 
-            public static bool operator !=(TableInfo lhs, TableInfo rhs)
-            {
-                if (lhs == null && rhs == null) return false;
-                if (lhs == null || rhs == null) return true;
-                return lhs._hashCode != rhs._hashCode;
-            }
-
-            public override bool Equals(object obj)
-            {
-                return _hashCode == obj.GetHashCode();
+                if (Suit == -1)
+                {
+                    var cardScores = new List<int>();
+                    for (var index = 0; index < Ranks.Length; index++)
+                    {
+                        var rank = Ranks[index];
+                        var suit = 'D';
+                        if (index == 0)
+                            suit = 'H'; // may result in weird hands like 2D 3H 3H ...
+                        // score mixed suits (non-flush) by using a different suit for the first card
+                        cardScores.Add(ranker.ScoreCard(new string(new[] {ScoreToRank[rank], suit})));
+                    }
+                    Score = ranker.ScoreHand(cardScores);
+                }
+                else
+                {
+                    // score using the same suit for all cards (flush)
+                    Score =
+                        ranker.ScoreHand(
+                            Ranks.Select(rank => ranker.ScoreCard(new string(new[] {ScoreToRank[rank], 'H'}))));
+                }
             }
         }
-
     }
 }

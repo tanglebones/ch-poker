@@ -26,6 +26,6 @@ namespace CH.Poker.Test
             }
         }
 
-        private readonly IRanker[] _rankers = new IRanker[] {new SimpleRanker()};//, new TwoPlusTwoRanker()};
+        private readonly IRanker[] _rankers = new IRanker[] {new SimpleRanker(), new TwoPlusTwoRanker()};
     }
 }
